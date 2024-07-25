@@ -53,7 +53,7 @@ export const StorePicker: FC = () => {
               ),
               [{ text: "Đóng", close: true, danger: true }],
             ]}
-          ></ActionSheet>,
+          />,
           document.body,
         )}
     </>

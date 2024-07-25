@@ -1,51 +1,73 @@
 import { atom, selector, selectorFamily } from "recoil";
-import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
 import logo from "static/logo.png";
-import { Category } from "types/category";
-import { Product, Variant } from "types/product";
+import subscriptionIcon from "static/subscription-decor.svg";
 import { Cart } from "types/cart";
-import { Notification } from "types/notification";
-import { calculateDistance } from "utils/location";
+import { Category } from "types/category";
 import { Store } from "types/delivery";
-import { calcFinalPrice } from "utils/product";
+import { Notification } from "types/notification";
+import { Product } from "types/product";
 import { wait } from "utils/async";
-import categories from "../mock/categories.json";
+import { API_URL } from "utils/constant";
+import { calculateDistance } from "utils/location";
+import { calcFinalPrice } from "utils/price";
+import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
+
 
 export const userState = selector({
   key: "user",
   get: async () => {
+    let userData = {
+      id: "",
+      avatar: "",
+      name: "Người dùng Zalo",
+    }
     try {
       const { userInfo } = await getUserInfo({ autoRequestPermission: true });
-      return userInfo;
+      userData = {...userInfo}
     } catch (error) {
-      return {
-        id: "",
-        avatar: "",
-        name: "Người dùng Zalo",
-      };
+      console.log(error);
+    } finally {
+      return userData
     }
   },
 });
 
 export const categoriesState = selector<Category[]>({
   key: "categories",
-  get: () => categories,
+  get: async () => {
+    const categoryData = await fetch(`${API_URL}/sheet?categories`)
+      .then(response => response.json())
+      .catch(error => {
+        console.error(error);
+        return [] as Category[]
+      })
+    return categoryData as Category[]
+  }
 });
 
 export const productsState = selector<Product[]>({
   key: "products",
   get: async () => {
-    await wait(2000);
-    const products = (await import("../mock/products.json")).default;
-    const variants = (await import("../mock/variants.json"))
-      .default as Variant[];
+    // await wait(2000);
+    // const products = (await import("../mock/products.json")).default;
+    const products = await fetch(`${API_URL}/sheet?products`)
+      .then((res) => res.json())
+      .catch((error) => {
+        console.error(error);
+        return [] as Product[]
+      })
+    // const variants = (
+    //   await import("../mock/variants.json")
+    // ).default as Variant[];
     return products.map(
       (product) =>
         ({
+          // priceBefore: convertPriceToNumber(product.priceBefore),
+          // priceSale: convertPriceToNumber(product.priceSale),
           ...product,
-          variants: variants.filter((variant) =>
-            product.variantId.includes(variant.id)
-          ),
+          // variants:
+          //   product.variantId.includes(.id)
+          // ),
         } as Product)
     );
   },
@@ -55,7 +77,7 @@ export const recommendProductsState = selector<Product[]>({
   key: "recommendProducts",
   get: ({ get }) => {
     const products = get(productsState);
-    return products.filter((p) => p.sale);
+    return products.filter((p) => p.priceSale);
   },
 });
 
@@ -71,7 +93,7 @@ export const productsByCategoryState = selectorFamily<Product[], string>({
     ({ get }) => {
       const allProducts = get(productsState);
       return allProducts.filter((product) =>
-        product.categoryId.includes(categoryId)
+        product.category.includes(categoryId)
       );
     },
 });
@@ -109,13 +131,19 @@ export const notificationsState = atom<Notification[]>({
       image: logo,
       title: "Chào bạn mới",
       content:
-        "Cảm ơn đã sử dụng ZaUI Coffee, bạn có thể dùng ứng dụng này để tiết kiệm thời gian xây dựng",
+        "Cảm ơn đã đến với onMart, bạn có thể dùng ứng dụng này để tiết kiệm thời gian đi chợ",
     },
     {
       id: 2,
       image: logo,
       title: "Giảm 50% lần đầu mua hàng",
-      content: "Nhập WELCOME để được giảm 50% giá trị đơn hàng đầu tiên order",
+      content: "Nhập WELCOME để được giảm 50% giá trị đơn hàng đầu tiên",
+    },
+    {
+      id: 3,
+      image: subscriptionIcon,
+      title: "Đơn hàng sẽ được giao đến bạn trong vòng 3h",
+      content: "Bạn đã thanh toán thành công đơn hàng",
     },
   ],
 });

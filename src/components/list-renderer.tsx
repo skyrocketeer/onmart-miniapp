@@ -10,6 +10,7 @@ interface ListRendererProps<T> {
   renderKey?: (item: T) => string;
   onClick?: (item: T) => void;
   noDivider?: boolean;
+  isCollapsable?: boolean;
 }
 
 export function ListRenderer<T>({
@@ -21,6 +22,7 @@ export function ListRenderer<T>({
   renderKey,
   onClick,
   noDivider,
+  isCollapsable
 }: ListRendererProps<T>) {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const collapsedItems = useMemo(() => {
@@ -41,14 +43,14 @@ export function ListRenderer<T>({
             <Box className="flex-1 min-w-0 relative">
               {renderRight(item)}
               {!noDivider && i < list.length - 1 && (
-                <hr className="absolute left-0 -right-4 -bottom-4 border-divider border-t-[0.5px]"></hr>
+                <hr className="absolute left-0 -right-4 -bottom-4 border-divider border-t-[1px]" />
               )}
             </Box>
           </div>
         ))}
       </Box>
-      {isCollapsed && collapsedItems.length < items.length ? (
-        <Box className="p-2">
+      {isCollapsed && collapsedItems.length < items.length ?
+        (<Box className="p-2">
           <Button
             onClick={() => setIsCollapsed(false)}
             fullWidth
@@ -59,9 +61,21 @@ export function ListRenderer<T>({
             Xem thêm
           </Button>
         </Box>
-      ) : (
-        <Box className="w-full h-4"></Box>
-      )}
+        ) : isCollapsable || collapsedItems.length > items.length ?
+          (<Box className="p-2">
+            <Button
+              onClick={() => setIsCollapsed(true)}
+              fullWidth
+              suffixIcon={<Icon icon="zi-chevron-up" />}
+              variant="tertiary"
+              type="neutral"
+            >
+              Thu gọn
+            </Button>
+          </Box>
+          ) :
+          (<Box className="w-full h-4" />)
+      }
     </Box>
   );
 }

@@ -1,36 +1,47 @@
 import { useVirtualKeyboardVisible } from "hooks";
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { MenuItem } from "types/menu";
 import { BottomNavigation, Icon } from "zmp-ui";
 import { CartIcon } from "./cart-icon";
 
-const tabs: Record<string, MenuItem> = {
-  "/": {
+type NavItemProps = {
+  path: string
+  label: string
+  icon: ReactNode,
+  activeIcon?: ReactNode
+}
+
+const tabs: Array<NavItemProps> = [
+  {
+    path: "/",
     label: "Trang chủ",
     icon: <Icon icon="zi-home" />,
+    // activeIcon: <Icon icon="zi-home" />
   },
-  "/notification": {
+  {
+    path: "/notification",
     label: "Thông báo",
     icon: <Icon icon="zi-notif" />,
+    // activeIcon: <Icon icon="zi-notif" />,
   },
-  "/cart": {
+  {
+    path: "/cart",
     label: "Giỏ hàng",
     icon: <CartIcon />,
     activeIcon: <CartIcon active />,
   },
-  "/profile": {
+  {
+    path: "/profile",
     label: "Cá nhân",
     icon: <Icon icon="zi-user" />,
+    // activeIcon: <Icon icon="zi-user-solid" />,
   },
-};
-
-export type TabKeys = keyof typeof tabs;
+];
 
 export const NO_BOTTOM_NAVIGATION_PAGES = ["/search", "/category", "/result"];
 
 export const Navigation: FC = () => {
-  const [activeTab, setActiveTab] = useState<TabKeys>("/");
+  const [activeTab, setActiveTab] = useState("/");
   const keyboardVisible = useVirtualKeyboardVisible();
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,19 +54,27 @@ export const Navigation: FC = () => {
     return <></>;
   }
 
+  useEffect(() => {
+    if (tabs.find((item) => item.path === location.pathname)) {
+      setActiveTab(location.pathname);
+    }
+  }, [location]);
+
   return (
     <BottomNavigation
       id="footer"
       activeKey={activeTab}
-      onChange={(key: TabKeys) => setActiveTab(key)}
+      onChange={(key: string) => {
+        setActiveTab(key)
+      }}
       className="z-50"
     >
-      {Object.keys(tabs).map((path: TabKeys) => (
+      {tabs.map(({ path, label, icon, activeIcon }) => (
         <BottomNavigation.Item
           key={path}
-          label={tabs[path].label}
-          icon={tabs[path].icon}
-          activeIcon={tabs[path].activeIcon}
+          label={label}
+          icon={icon}
+          activeIcon={activeIcon}
           onClick={() => navigate(path)}
         />
       ))}

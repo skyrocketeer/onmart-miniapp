@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { Pagination } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { getDummyImage } from "utils/product";
+import { getDummyImage } from "utils/price";
 import { Box } from "zmp-ui";
 
 export const Banner: FC = () => {

@@ -37,7 +37,7 @@ export const TimePicker: FC = () => {
     time.setSeconds(0);
     time.setMilliseconds(0);
     const endTime = new Date();
-    endTime.setHours(21);
+    endTime.setHours(24);
     endTime.setMinutes(0);
     endTime.setSeconds(0);
     endTime.setMilliseconds(0);
@@ -45,6 +45,7 @@ export const TimePicker: FC = () => {
       times.push(new Date(time));
       time.setMinutes(time.getMinutes() + 30);
     }
+
     return times;
   }, [date]);
 
@@ -93,6 +94,10 @@ export const TimePicker: FC = () => {
           name: "date",
         },
       ]}
+      action={{
+        text: "Giao ngay lập tức (trong vòng 30 phút)",
+        close: true
+      }}
     />
   );
 };

@@ -1,10 +1,10 @@
 import React, { FC } from "react";
-import { Box, Header, Text } from "zmp-ui";
 import { useRecoilValueLoadable } from "recoil";
 import { userState } from "state";
 import logo from "static/logo.png";
-import appConfig from "../../../app-config.json";
 import { getConfig } from "utils/config";
+import { Box, Header, Text } from "zmp-ui";
+import appConfig from "../../../app-config.json";
 
 export const Welcome: FC = () => {
   const user = useRecoilValueLoadable(userState);

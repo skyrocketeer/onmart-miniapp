@@ -1,8 +1,10 @@
-import _ from "lodash";
 import { useEffect, useRef, useState } from "react";
+import { getConfig } from "utils/config";
 import { matchStatusBarColor } from "utils/device";
+import { generateMac } from "utils/helpers";
 import { EventName, events, Payment } from "zmp-sdk";
 import { useNavigate, useSnackbar } from "zmp-ui";
+import { OrderData } from './types/order';
 
 export function useMatchStatusTextColor(visible?: boolean) {
   const changedRef = useRef(false);
@@ -33,10 +35,35 @@ export function useVirtualKeyboardVisible() {
   return visible;
 }
 
+export const useCreateOrder = async (orderData: OrderData) => {
+  const mac = await generateMac(orderData)
+
+  Payment.createOrder({
+    desc:
+      orderData.description ??
+      `Thanh toán cho ${getConfig((config) => config.app.title)}`,
+    item: orderData.item,
+    extradata: orderData.extraData,
+    method: {
+      id: orderData.method,
+      isCustom: true
+    },
+    mac,
+    amount: orderData.amount,
+    success: (data) => {
+      console.log("Payment success: ", data);
+    },
+    fail: (err) => {
+      console.log("Payment error: ", err);
+    },
+  });
+}
+
 export const useHandlePayment = () => {
   const navigate = useNavigate();
   useEffect(() => {
     events.on(EventName.OpenApp, (data) => {
+      console.log(EventName.OpenApp)
       if (data?.path) {
         navigate(data?.path, {
           state: data,

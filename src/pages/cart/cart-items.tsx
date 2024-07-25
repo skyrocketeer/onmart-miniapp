@@ -20,12 +20,13 @@ export const CartItems: FC = () => {
             <ListRenderer
               items={cart}
               limit={3}
+              isCollapsable
               onClick={(item) => {
                 setEditingItem(item);
                 open();
               }}
               renderKey={({ product, options, quantity }) =>
-                JSON.stringify({ product: product.id, options, quantity })
+                JSON.stringify({ product: product.sku, options, quantity })
               }
               renderLeft={(item) => (
                 <img

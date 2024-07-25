@@ -6,7 +6,7 @@ import { useSetRecoilState } from "recoil";
 import { cartState } from "state";
 import { SelectedOptions } from "types/cart";
 import { Product } from "types/product";
-import { isIdentical } from "utils/product";
+import { isIdentical } from "utils/price";
 import { Box, Button, Text } from "zmp-ui";
 import { MultipleOptionPicker } from "./multiple-option-picker";
 import { QuantityPicker } from "./quantity-picker";
@@ -18,7 +18,11 @@ export interface ProductPickerProps {
     options: SelectedOptions;
     quantity: number;
   };
-  children: (methods: { open: () => void; close: () => void }) => ReactNode;
+  children: (methods: {
+    open: () => void;
+    close: () => void;
+    added?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  }) => ReactNode;
 }
 
 function getDefaultOptions(product?: Product) {
@@ -61,7 +65,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
           // updating an existing cart item, including quantity and size, or remove it if new quantity is 0
           const editing = cart.find(
             (item) =>
-              item.product.id === product.id &&
+              item.product.sku === product.sku &&
               isIdentical(item.options, selected.options),
           )!;
           if (quantity === 0) {
@@ -70,7 +74,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
             const existed = cart.find(
               (item, i) =>
                 i !== cart.indexOf(editing) &&
-                item.product.id === product.id &&
+                item.product.sku === product.sku &&
                 isIdentical(item.options, options),
             )!;
             res.splice(cart.indexOf(editing), 1, {
@@ -86,7 +90,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
           // adding new item to cart, or merging if it already existed before
           const existed = cart.find(
             (item) =>
-              item.product.id === product.id &&
+              item.product.sku === product.sku &&
               isIdentical(item.options, options),
           );
           if (existed) {
@@ -107,12 +111,19 @@ export const ProductPicker: FC<ProductPickerProps> = ({
     }
     setVisible(false);
   };
+
+  const handleAddToCartNow = () => {
+    addToCart()
+  }
+
   return (
     <>
       {children({
         open: () => setVisible(true),
         close: () => setVisible(false),
+        added: (e) => handleAddToCartNow()
       })}
+
       {createPortal(
         <Sheet visible={visible} onClose={() => setVisible(false)} autoHeight>
           {product && (

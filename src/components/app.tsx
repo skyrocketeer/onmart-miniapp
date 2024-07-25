@@ -1,8 +1,15 @@
+import CartPage from "pages/cart";
+import CategoryPage from "pages/category";
+import HomePage from "pages/index";
+import NotificationPage from "pages/notification";
+import ProfilePage from "pages/profile";
+import CheckoutResultPage from "pages/result";
+import SearchPage from "pages/search";
 import React from "react";
-import { App, ZMPRouter, SnackbarProvider } from "zmp-ui";
+import { Route, Routes } from "react-router";
 import { RecoilRoot } from "recoil";
 import { getConfig } from "utils/config";
-import { Layout } from "./layout";
+import { App, SnackbarProvider, ZMPRouter } from "zmp-ui";
 import { ConfigProvider } from "./config-provider";
 
 const MyApp = () => {
@@ -17,7 +24,15 @@ const MyApp = () => {
         <App>
           <SnackbarProvider>
             <ZMPRouter>
-              <Layout />
+              <Routes>
+                <Route path="/" element={<HomePage />}></Route>
+                <Route path="/search" element={<SearchPage />}></Route>
+                <Route path="/category" element={<CategoryPage />}></Route>
+                <Route path="/notification" element={<NotificationPage />}></Route>
+                <Route path="/cart" element={<CartPage />}></Route>
+                <Route path="/profile" element={<ProfilePage />}></Route>
+                <Route path="/result" element={<CheckoutResultPage />}></Route>
+              </Routes>
             </ZMPRouter>
           </SnackbarProvider>
         </App>

@@ -5,7 +5,6 @@ import { Box, Text } from "zmp-ui";
 
 export const CartIcon: FC<{ active?: boolean }> = ({ active }) => {
   const cart = useRecoilValue(cartState);
-
   return (
     <Box className="relative">
       <svg

@@ -1,4 +1,3 @@
-import { DisplayPriceChange } from "components/display/price-change";
 import React, { FC } from "react";
 import { MultipleOptionVariant, Product } from "types/product";
 import { Box, Checkbox, Text } from "zmp-ui";
@@ -21,11 +20,11 @@ export const MultipleOptionPicker: FC<{
           label: (
             <div className="w-full">
               <span className="flex-1">{option.label}</span>
-              <span className="absolute right-0">
+              {/* <span className="absolute right-0">
                 <DisplayPriceChange option={option}>
                   {product}
                 </DisplayPriceChange>
-              </span>
+              </span> */}
             </div>
           ) as any,
         }))}

@@ -1,8 +1,8 @@
 {
-  "name": "zaui-coffee",
+  "name": "onmart",
   "private": true,
   "version": "1.1.0",
-  "description": "ZaUI Coffee",
+  "description": "onMart App",
   "repository": "",
   "license": "UNLICENSED",
   "browserslist": [
@@ -15,7 +15,7 @@
     "Samsung >= 5"
   ],
   "scripts": {
-    "start": "zmp start",
+    "start": "NODE_ENV=prod zmp start",
     "deploy": "zmp deploy",
     "build:css": "postcss src/css/tailwind.css -o src/css/styles.css"
   },
@@ -30,10 +30,12 @@
     "react-router-dom": "^6.8.2",
     "recoil": "^0.7.7",
     "swiper": "^9.1.0",
+    "uuid": "^10.0.0",
     "zmp-sdk": "^2.39.0",
     "zmp-ui": "^1.6.0-rc.6"
   },
   "devDependencies": {
+    "@types/node": "^20.14.11",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@types/react-router-dom": "^5.3.3",

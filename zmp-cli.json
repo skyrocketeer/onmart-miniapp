@@ -1,6 +1,5 @@
 {
-  "cwd": "/Users/lap15182-local/Desktop/zalo/zaui-coffee",
-  "name": "ZaUI Coffee",
+  "name": "onMart App",
   "framework": "react-typescript",
   "cssPreProcessor": "scss",
   "includeTailwind": true,

@@ -1,9 +1,10 @@
-import React, { FC } from "react";
+import { Divider } from "components/divider";
+import { MainLayout } from "components/layout/layout-main";
 import { ListRenderer } from "components/list-renderer";
+import React, { FC } from "react";
 import { useRecoilValue } from "recoil";
 import { notificationsState } from "state";
-import { Box, Header, Page, Text } from "zmp-ui";
-import { Divider } from "components/divider";
+import { Box, Header, Text } from "zmp-ui";
 
 const NotificationList: FC = () => {
   const notifications = useRecoilValue(notificationsState);
@@ -33,11 +34,11 @@ const NotificationList: FC = () => {
 
 const NotificationPage: FC = () => {
   return (
-    <Page>
+    <MainLayout>
       <Header title="Thông báo" showBackIcon={false} />
       <Divider />
       <NotificationList />
-    </Page>
+    </MainLayout>
   );
 };
 

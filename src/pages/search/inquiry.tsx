@@ -1,9 +1,8 @@
-import React, { useCallback } from "react";
-import { FC } from "react";
+import { debounce } from "lodash";
+import React, { FC, useCallback } from "react";
 import { useRecoilState } from "recoil";
 import { keywordState } from "state";
 import { Box, Input } from "zmp-ui";
-import { debounce } from "lodash";
 
 export const Inquiry: FC = () => {
   const [keyword, setKeyword] = useRecoilState(keywordState);
@@ -31,6 +30,7 @@ export const Inquiry: FC = () => {
       }
     >
       <Input.Search
+        className="cus-input-search"
         ref={(el) => {
           if (!el?.input?.value) {
             el?.focus();

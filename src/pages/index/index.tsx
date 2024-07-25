@@ -1,19 +1,20 @@
+import { Divider } from "components/divider";
+import { MainLayout } from "components/layout/layout-main";
+import { SearchBar } from "components/top-search-bar";
 import React, { Suspense } from "react";
-import { Box, Page } from "zmp-ui";
-import { Inquiry } from "./inquiry";
-import { Welcome } from "./welcome";
+import { Box } from "zmp-ui";
 import { Banner } from "./banner";
 import { Categories } from "./categories";
-import { Recommend } from "./recommend";
 import { ProductList } from "./product-list";
-import { Divider } from "components/divider";
+import { Recommend } from "./recommend";
+import { Welcome } from "./welcome";
 
 const HomePage: React.FunctionComponent = () => {
   return (
-    <Page className="relative flex-1 flex flex-col bg-white">
+    <MainLayout>
       <Welcome />
       <Box className="flex-1 overflow-auto">
-        <Inquiry />
+        <SearchBar />
         <Banner />
         <Suspense>
           <Categories />
@@ -22,9 +23,8 @@ const HomePage: React.FunctionComponent = () => {
         <Recommend />
         <Divider />
         <ProductList />
-        <Divider />
       </Box>
-    </Page>
+    </MainLayout>
   );
 };
 

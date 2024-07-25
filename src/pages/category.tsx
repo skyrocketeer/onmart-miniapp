@@ -1,3 +1,4 @@
+import { MainLayout } from "components/layout/layout-main";
 import { ProductItem } from "components/product/item";
 import React, { FC, Suspense } from "react";
 import { useRecoilValue } from "recoil";
@@ -43,9 +44,9 @@ const CategoryProducts: FC<{ categoryId: string }> = ({ categoryId }) => {
     );
   }
   return (
-    <Box className="bg-background grid grid-cols-2 gap-4 p-4">
+    <Box className="bg-background grid gap-4 p-4">
       {productsByCategory.map((product) => (
-        <ProductItem key={product.id} product={product} />
+        <ProductItem key={product.sku} product={product} />
       ))}
     </Box>
   );
@@ -53,10 +54,12 @@ const CategoryProducts: FC<{ categoryId: string }> = ({ categoryId }) => {
 
 const CategoryPage: FC = () => {
   return (
-    <Page className="flex flex-col">
-      <Header title="Danh mục" />
-      <CategoryPicker />
-    </Page>
+    <MainLayout>
+      <Page className="flex flex-col">
+        <Header title="Danh mục" />
+        <CategoryPicker />
+      </Page>
+    </MainLayout>
   );
 };
 

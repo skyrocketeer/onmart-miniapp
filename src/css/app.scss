@@ -116,3 +116,17 @@ body {
     }
   }
 }
+
+.cus-input-search {
+  height: 32px;
+  font-size: small;
+
+  .zaui-input.zaui-input-search.cus-input-search {
+    height: 26px;
+  }
+
+  .zaui-btn-icon {
+    width: 16px;
+    height: 16px;
+  }
+}

@@ -1,8 +1,9 @@
-import React, { FC } from "react";
-import { Box, Header, Icon, Page, Text } from "zmp-ui";
-import subscriptionDecor from "static/subscription-decor.svg";
+import { MainLayout } from "components/layout/layout-main";
 import { ListRenderer } from "components/list-renderer";
 import { useToBeImplemented } from "hooks";
+import React, { FC } from "react";
+import subscriptionDecor from "static/subscription-decor.svg";
+import { Box, Header, Icon, Text } from "zmp-ui";
 
 const Subscription: FC = () => {
   const onClick = useToBeImplemented();
@@ -103,12 +104,12 @@ const Other: FC = () => {
 
 const ProfilePage: FC = () => {
   return (
-    <Page>
+    <MainLayout>
       <Header showBackIcon={false} title="&nbsp;" />
       <Subscription />
       <Personal />
       <Other />
-    </Page>
+    </MainLayout>
   );
 };
 
