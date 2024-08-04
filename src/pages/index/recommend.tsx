@@ -7,7 +7,7 @@ import React, { FC, Suspense } from "react";
 import { useRecoilValue } from "recoil";
 import { recommendProductsState } from "state";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { convertPriceToNumber } from "utils/price";
+import { convertStringToNumber } from "utils/helpers";
 import { Box, Text } from "zmp-ui";
 
 export const RecommendContent: FC = () => {
@@ -31,7 +31,7 @@ export const RecommendContent: FC = () => {
                         className="absolute right-2 top-2 uppercase bg-green text-white h-4 px-[6px] rounded-full"
                       >
                         {"-"}
-                        {/* {convertPriceToNumber(product.priceSale) * 100}% */}
+                        {/* {convertStringToNumber(product.priceSale) * 100}% */}
                         {/* {product.priceSale.type === "percent" ? ( */}
                         {/* `$?{product.priceSale.percent * 100}%` */}
                         {/* // ) : ( */}
@@ -43,7 +43,7 @@ export const RecommendContent: FC = () => {
                   <Box className="space-y-1">
                     <Text size="small">{product.name}</Text>
                     <Text size="xxSmall" className="line-through text-red-600">
-                      <DisplayPrice useCurrency>{convertPriceToNumber(product.priceBefore)}</DisplayPrice>
+                      <DisplayPrice useCurrency>{convertStringToNumber(product.priceBefore)}</DisplayPrice>
                     </Text>
                     <Text size="large" className="font-medium text-primary">
                       <FinalPrice>{product}</FinalPrice>

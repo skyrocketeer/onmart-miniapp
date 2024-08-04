@@ -25,13 +25,13 @@ const MyApp = () => {
           <SnackbarProvider>
             <ZMPRouter>
               <Routes>
-                <Route path="/" element={<HomePage />}></Route>
-                <Route path="/search" element={<SearchPage />}></Route>
-                <Route path="/category" element={<CategoryPage />}></Route>
-                <Route path="/notification" element={<NotificationPage />}></Route>
-                <Route path="/cart" element={<CartPage />}></Route>
-                <Route path="/profile" element={<ProfilePage />}></Route>
-                <Route path="/result" element={<CheckoutResultPage />}></Route>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/category" element={<CategoryPage />} />
+                <Route path="/notification" element={<NotificationPage />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/result" element={<CheckoutResultPage />} />
               </Routes>
             </ZMPRouter>
           </SnackbarProvider>

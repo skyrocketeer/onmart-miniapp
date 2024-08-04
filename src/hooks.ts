@@ -4,7 +4,7 @@ import { matchStatusBarColor } from "utils/device";
 import { generateMac } from "utils/helpers";
 import { EventName, events, Payment } from "zmp-sdk";
 import { useNavigate, useSnackbar } from "zmp-ui";
-import { OrderData } from './types/order';
+import { OrderData, ShippingData } from './types/order';
 
 export function useMatchStatusTextColor(visible?: boolean) {
   const changedRef = useRef(false);
@@ -35,26 +35,26 @@ export function useVirtualKeyboardVisible() {
   return visible;
 }
 
-export const useCreateOrder = async (orderData: OrderData) => {
-  const mac = await generateMac(orderData)
-
-  Payment.createOrder({
+export const useCreateOrder = async (orderData: OrderData, shippingData: ShippingData, callback: Function) => {
+  const mac = await generateMac(orderData, shippingData)
+  await Payment.createOrder({
     desc:
       orderData.description ??
       `Thanh toán cho ${getConfig((config) => config.app.title)}`,
     item: orderData.item,
     extradata: orderData.extraData,
     method: {
-      id: orderData.method,
-      isCustom: true
+      id: orderData.method.id,
+      isCustom: orderData.method.isCustom
     },
     mac,
     amount: orderData.amount,
     success: (data) => {
-      console.log("Payment success: ", data);
+      const { orderId } = data;
+      callback(orderId)
     },
     fail: (err) => {
-      console.log("Payment error: ", err);
+      throw err
     },
   });
 }
@@ -63,7 +63,6 @@ export const useHandlePayment = () => {
   const navigate = useNavigate();
   useEffect(() => {
     events.on(EventName.OpenApp, (data) => {
-      console.log(EventName.OpenApp)
       if (data?.path) {
         navigate(data?.path, {
           state: data,

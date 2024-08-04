@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { Box, Button, Icon, Text } from "zmp-ui";
 
 interface ListRendererProps<T> {
@@ -28,6 +28,12 @@ export function ListRenderer<T>({
   const collapsedItems = useMemo(() => {
     return items.slice(0, limit);
   }, [items]);
+
+  useEffect(() => {
+    if (items.length <= limit!!)
+      setIsCollapsed(!isCollapsed)
+    return;
+  }, [items])
 
   return (
     <Box className="bg-background rounded-xl">
@@ -61,7 +67,7 @@ export function ListRenderer<T>({
             Xem thêm
           </Button>
         </Box>
-        ) : isCollapsable || collapsedItems.length > items.length ?
+        ) : isCollapsable && !isCollapsed ?
           (<Box className="p-2">
             <Button
               onClick={() => setIsCollapsed(true)}

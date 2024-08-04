@@ -2,7 +2,7 @@ import PaymentCard, { PAYMENT_OPTION } from "components/card/payment-method";
 import { Divider } from "components/divider";
 import { SecondaryLayout } from "components/layout/layout-secondary";
 import { useVirtualKeyboardVisible } from "hooks";
-import React, { FC, useState } from "react";
+import React, { FC, ReactNode, useState } from "react";
 import cx from "utils/helpers";
 import { Box, Header, Icon, Text } from "zmp-ui";
 import { CartItems } from "./cart-items";
@@ -21,7 +21,6 @@ const CartPage: FC = () => {
 
   const PaymentOptions = () => {
     const [selectedMethod, setSelectedMethod] = useState<PAYMENT_OPTION>(PAYMENT_OPTION.COD);
-
     const methods = [
       {
         type: PAYMENT_OPTION["COD"],

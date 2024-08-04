@@ -1,9 +1,10 @@
 import { SelectedOptions } from "types/cart";
 import { Option, Product } from "types/product";
+import { convertStringToNumber } from "./helpers";
 
 export function calcFinalPrice(product: Product, options?: SelectedOptions) {
-  const priceBefore = convertPriceToNumber(product.priceBefore);
-  const priceSale = convertPriceToNumber(product.priceSale || "0");
+  const priceBefore = convertStringToNumber(product.priceBefore);
+  const priceSale = convertStringToNumber(product.priceSale || "0");
   //   if (product.sale.type === "fixed") {
     // finalPrice = product.price - product.sale.amount;
   //   } else {
@@ -90,16 +91,4 @@ export function splitByComma(price) {
 
   // Format the result
   return `${wholeNumber.toLocaleString()}`;
-}
-
-export function convertPriceToNumber(price: string): number {
-    // Remove any non-numeric characters except for dot (.) and minus (-)
-    const numericString = price.replace(/[^0-9.-]/g, '');
-
-    // Parse the numeric string to a float number
-    const numericValue = parseFloat(numericString);
-
-    if (isNaN(numericValue))
-      return 0;
-    return numericValue;
 }

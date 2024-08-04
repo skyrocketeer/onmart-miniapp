@@ -34,6 +34,10 @@ export interface MultipleOptionVariant extends BaseVariant {
 
 export type Variant = SingleOptionVariant | MultipleOptionVariant;
 
+export enum StockStatus {
+  ON = "ON",
+  OFF = "OFF"
+}
 export interface Product {
   sku: string;
   name: string;
@@ -44,4 +48,5 @@ export interface Product {
   priceSale: string;
   // priceSale?: Sale;
   variants?: Variant[];
+  inStock: StockStatus;
 }

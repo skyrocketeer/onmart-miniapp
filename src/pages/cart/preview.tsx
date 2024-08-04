@@ -1,16 +1,21 @@
 import { DisplayPrice } from "components/display/price";
 import { useCreateOrder } from "hooks";
-import React, { FC } from "react";
-import { useRecoilValue } from "recoil";
-import { cartState, totalPriceState, totalQuantityState } from "state";
+import React, { FC, useState } from "react";
+import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
+import { cartState, defaultShippingState, shippingInfoState, totalPriceState, totalQuantityState } from "state";
 import { OrderData } from "types/order";
 import { v4 as uuidv4 } from 'uuid';
-import { Box, Button, Text } from "zmp-ui";
+import { Box, Button, Text, useNavigate } from "zmp-ui";
 
 export const CartPreview: FC = () => {
   const quantity = useRecoilValue(totalQuantityState);
   const totalPrice = useRecoilValue(totalPriceState);
   const cart = useRecoilValue(cartState);
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate();
+  const shippingInfo = useRecoilValue(shippingInfoState)
+  const resetShipDataState = useResetRecoilState(shippingInfoState)
+  const resetOrderDataState = useResetRecoilState(cartState)
 
   const generateMacData = () => {
     const tid = uuidv4()
@@ -30,10 +35,27 @@ export const CartPreview: FC = () => {
         myTransactionId: tid,
         notes: "Test"
       },
-      method: "COD",
+      method: {
+        id: "COD",
+        isCustom: false,
+      },
       quantity: quantity,
       item: listOrderItem
     } as OrderData
+  }
+
+  const handleCreateOrder = async () => {
+    setIsSubmitting(true)
+    await useCreateOrder(generateMacData(), shippingInfo, (orderId: string) => {
+      try {
+        setIsSubmitting(false)
+        navigate(`/result${location.search}`)
+      } catch (err) {
+        console.log('payment err ', err)
+      }
+    })
+    resetOrderDataState()
+    resetShipDataState()
   }
 
   return (
@@ -53,9 +75,9 @@ export const CartPreview: FC = () => {
       </Box>
       <Button
         type="highlight"
-        disabled={!quantity}
+        disabled={!quantity || isSubmitting}
         fullWidth
-        onClick={() => useCreateOrder(generateMacData())}
+        onClick={handleCreateOrder}
       >
         Đặt hàng
       </Button>

@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { getConfig } from "utils/config";
-import { convertPriceToNumber } from "utils/price";
+import { convertStringToNumber } from "utils/helpers";
 
 export const DisplayPrice: FC<{ children: number, useCurrency?: boolean }> = ({ children, useCurrency }) => {
   const symbol = getConfig((config) => config.template.currencySymbol);
@@ -22,7 +22,7 @@ export const DisplayPrice: FC<{ children: number, useCurrency?: boolean }> = ({ 
 };
 
 export const getDiscountInPercent = (originalPrice: string, discountPrice: string) => {
-  if (convertPriceToNumber(discountPrice) == 0 || convertPriceToNumber(discountPrice) > convertPriceToNumber(originalPrice))
+  if (convertStringToNumber(discountPrice) == 0 || convertStringToNumber(discountPrice) > convertStringToNumber(originalPrice))
     return 0
-  return 1 - (convertPriceToNumber(discountPrice) / convertPriceToNumber(originalPrice))
+  return 1 - (convertStringToNumber(discountPrice) / convertStringToNumber(originalPrice))
 }

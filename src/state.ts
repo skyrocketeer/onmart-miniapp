@@ -1,17 +1,17 @@
-import { atom, selector, selectorFamily } from "recoil";
+import { atom, selector, selectorFamily, useRecoilValue } from "recoil";
 import logo from "static/logo.png";
 import subscriptionIcon from "static/subscription-decor.svg";
 import { Cart } from "types/cart";
 import { Category } from "types/category";
 import { Store } from "types/delivery";
 import { Notification } from "types/notification";
+import { ShippingData } from "types/order";
 import { Product } from "types/product";
 import { wait } from "utils/async";
 import { API_URL } from "utils/constant";
 import { calculateDistance } from "utils/location";
 import { calcFinalPrice } from "utils/price";
 import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
-
 
 export const userState = selector({
   key: "user",
@@ -47,11 +47,13 @@ export const categoriesState = selector<Category[]>({
 
 export const productsState = selector<Product[]>({
   key: "products",
-  get: async () => {
+  get: async () => {  
     // await wait(2000);
     // const products = (await import("../mock/products.json")).default;
     const products = await fetch(`${API_URL}/sheet?products`)
-      .then((res) => res.json())
+      .then((res) => {
+        return res.json()
+      })
       .catch((error) => {
         console.error(error);
         return [] as Product[]
@@ -173,43 +175,43 @@ export const storesState = atom<Store[]>({
   default: [
     {
       id: 1,
-      name: "VNG Campus Store",
+      name: "Vườn Hydroworks",
       address:
-        "Khu chế xuất Tân Thuận, Z06, Số 13, Tân Thuận Đông, Quận 7, Thành phố Hồ Chí Minh, Việt Nam",
-      lat: 10.741639,
-      long: 106.714632,
+        "Quận 9, TPHCM",
+      lat: 10.801657,
+      long: 106.852870,
     },
-    {
-      id: 2,
-      name: "The Independence Palace",
-      address:
-        "135 Nam Kỳ Khởi Nghĩa, Bến Thành, Quận 1, Thành phố Hồ Chí Minh, Việt Nam",
-      lat: 10.779159,
-      long: 106.695271,
-    },
-    {
-      id: 3,
-      name: "Saigon Notre-Dame Cathedral Basilica",
-      address:
-        "1 Công xã Paris, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh, Việt Nam",
-      lat: 10.779738,
-      long: 106.699092,
-    },
-    {
-      id: 4,
-      name: "Bình Quới Tourist Village",
-      address:
-        "1147 Bình Quới, phường 28, Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam",
-      lat: 10.831098,
-      long: 106.733128,
-    },
-    {
-      id: 5,
-      name: "Củ Chi Tunnels",
-      address: "Phú Hiệp, Củ Chi, Thành phố Hồ Chí Minh, Việt Nam",
-      lat: 11.051655,
-      long: 106.494249,
-    },
+    // {
+    //   id: 2,
+    //   name: "The Independence Palace",
+    //   address:
+    //     "135 Nam Kỳ Khởi Nghĩa, Bến Thành, Quận 1, Thành phố Hồ Chí Minh, Việt Nam",
+    //   lat: 10.779159,
+    //   long: 106.695271,
+    // },
+    // {
+    //   id: 3,
+    //   name: "Saigon Notre-Dame Cathedral Basilica",
+    //   address:
+    //     "1 Công xã Paris, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh, Việt Nam",
+    //   lat: 10.779738,
+    //   long: 106.699092,
+    // },
+    // {
+    //   id: 4,
+    //   name: "Bình Quới Tourist Village",
+    //   address:
+    //     "1147 Bình Quới, phường 28, Bình Thạnh, Thành phố Hồ Chí Minh, Việt Nam",
+    //   lat: 10.831098,
+    //   long: 106.733128,
+    // },
+    // {
+    //   id: 5,
+    //   name: "Củ Chi Tunnels",
+    //   address: "Phú Hiệp, Củ Chi, Thành phố Hồ Chí Minh, Việt Nam",
+    //   lat: 11.051655,
+    //   long: 106.494249,
+    // },
   ],
 });
 
@@ -259,11 +261,6 @@ export const selectedStoreState = selector({
   },
 });
 
-export const selectedDeliveryTimeState = atom({
-  key: "selectedDeliveryTime",
-  default: +new Date(),
-});
-
 export const requestLocationTriesState = atom({
   key: "requestLocationTries",
   default: 0,
@@ -275,7 +272,7 @@ export const requestPhoneTriesState = atom({
 });
 
 export const locationState = selector<
-  { latitude: string; longitude: string } | false
+  { latitude: string; longitude: string }
 >({
   key: "location",
   get: async ({ get }) => {
@@ -303,11 +300,14 @@ export const locationState = selector<
         };
       }
     }
-    return false;
+    return {
+      latitude: "10.7287",
+      longitude: "106.7317",
+    };
   },
 });
 
-export const phoneState = selector<string | boolean>({
+export const phoneState = selector<string>({
   key: "phone",
   get: async ({ get }) => {
     const requested = get(requestPhoneTriesState);
@@ -324,14 +324,26 @@ export const phoneState = selector<string | boolean>({
         "Chi tiết tham khảo: ",
         "https://mini.zalo.me/blog/thong-bao-thay-doi-luong-truy-xuat-thong-tin-nguoi-dung-tren-zalo-mini-app"
       );
-      console.warn("Giả lập số điện thoại mặc định: 0337076898");
-      return "0337076898";
+      console.warn("Giả lập số điện thoại mặc định:");
+      return "";
     }
-    return false;
+    return "";
   },
 });
 
-export const orderNoteState = atom({
-  key: "orderNote",
-  default: "",
-});
+export const defaultShippingState = {
+  clientName: "",
+  phoneNumber: "",
+  shippingTime: new Date().toLocaleTimeString("vi-VN"),
+  shippingAddressCoord: {
+    latitude: 0,
+    longitude: 0,
+  },
+  shippingAddressText: "",
+  note: ""
+}
+
+export const shippingInfoState = atom<ShippingData>({
+  key: "shippingInfo",
+  default: defaultShippingState,
+})

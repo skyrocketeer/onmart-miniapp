@@ -28,3 +28,31 @@ export function displayDate(date: Date, hint?: boolean) {
   }
   return `${day}/${month}/${year}`;
 }
+
+function padToTwoDigits(num) {
+  return num.toString().padStart(2, '0');
+}
+
+export function fromMilisToDate(milis:number) {
+  const date = new Date(milis);
+    const day = padToTwoDigits(date.getDate());
+  const month = padToTwoDigits(date.getMonth() + 1); // Months are 0-based
+  const year = date.getFullYear();
+  
+  const hour = padToTwoDigits(date.getHours());
+  const minute = padToTwoDigits(date.getMinutes());
+  const second = padToTwoDigits(date.getSeconds());
+  const formattedDate = new Intl.DateTimeFormat('vi-VN', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZoneName: 'short'
+  }).format(date);
+
+  // Return manually formatted date with locale-based weekday and month names
+  return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
+}

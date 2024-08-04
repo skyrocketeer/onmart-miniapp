@@ -2,9 +2,9 @@ import { FinalPrice } from "components/display/final-price";
 import { DisplayPrice } from "components/display/price";
 import React, { FC } from "react";
 import { Product } from "types/product";
-import { convertPriceToNumber } from "utils/price";
 import { Box, Icon, Text } from "zmp-ui";
 import { ProductPicker } from "./picker";
+import { convertStringToNumber } from "utils/helpers";
 
 export const ProductItem: FC<{ product: Product }> = ({ product }) => {
   // const [isAddedToCartNow, setAddToCart] = useState(false)
@@ -23,7 +23,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
                 <Text className="font-semibold">{product.name}</Text>
                 {product.priceBefore > product.priceSale ?
                   (<Text size="xxSmall" className="line-through text-red-600">
-                    <DisplayPrice useCurrency>{convertPriceToNumber(product.priceBefore)}</DisplayPrice>
+                    <DisplayPrice useCurrency>{convertStringToNumber(product.priceBefore)}</DisplayPrice>
                   </Text>
                   ) : null
                 }

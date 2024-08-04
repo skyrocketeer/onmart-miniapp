@@ -24,7 +24,7 @@ export const MainLayout = ({ children }: { children: ReactNode }) => {
   const totalPrice = useRecoilValue(totalPriceState);
 
   const navigate = useNavigate();
-  useHandlePayment();
+  // useHandlePayment();
 
   return (
     <Box flex flexDirection="column" className="h-screen">

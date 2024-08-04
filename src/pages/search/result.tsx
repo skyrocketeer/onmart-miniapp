@@ -16,7 +16,7 @@ const SearchResultContent: FC = () => {
       {result.length > 0 ? (
         <Box className="p-4 pt-0 space-y-4 flex-1 overflow-y-auto">
           {result.map((product) => (
-            <ProductPicker key={product.id} product={product}>
+            <ProductPicker key={product.sku} product={product}>
               {({ open }) => (
                 <div onClick={open} className="flex items-center space-x-4">
                   <img

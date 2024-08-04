@@ -5,6 +5,7 @@ import React, { FC, Suspense } from "react";
 import { useRecoilValue } from "recoil";
 import { productsState } from "state";
 import { Box } from "zmp-ui";
+import { isInStock } from 'utils/product'
 
 export const ProductListContent: FC = () => {
   const products = useRecoilValue(productsState);
@@ -12,7 +13,7 @@ export const ProductListContent: FC = () => {
   return (
     <Section title="Danh sách sản phẩm">
       <Box className="grid gap-4">
-        {products.map((product) => (
+        {products.filter(product => isInStock(product.inStock)).map((product) => (
           <ProductItem key={product.sku} product={product} />
         ))}
       </Box>
