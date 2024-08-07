@@ -37,7 +37,8 @@ export const StorePicker: FC = () => {
         createPortal(
           <ActionSheet
             title="Các cửa hàng ở gần bạn"
-            visible={visible}
+            // visible={visible}
+            visible={false}
             onClose={() => setVisible(false)}
             actions={[
               nearbyStores.contents.map(

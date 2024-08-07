@@ -1,13 +1,60 @@
 import { FinalPrice } from "components/display/final-price";
 import { DisplayPrice } from "components/display/price";
-import React, { FC } from "react";
+import React, { FC, useCallback } from "react";
 import { Product } from "types/product";
 import { Box, Icon, Text } from "zmp-ui";
 import { ProductPicker } from "./picker";
-import { convertStringToNumber } from "utils/helpers";
+import cx, { convertStringToNumber } from "utils/helpers";
+import { useRecoilValue } from "recoil";
+import { cartState } from "state";
 
 export const ProductItem: FC<{ product: Product }> = ({ product }) => {
-  // const [isAddedToCartNow, setAddToCart] = useState(false)
+  const cart = useRecoilValue(cartState)
+
+  const getCurrentQuantity = (sku: string) => {
+    const existed = cart.find(item => item.product.sku === sku)
+    if (existed)
+      return existed.quantity
+    return 0
+  }
+
+  const AddButton = ({ added }: { added: Function }) => {
+    const handleClick = useCallback((onAdd: boolean) => {
+      console.log("htrue false", onAdd)
+      if (onAdd) {
+        console.log('truyen vo ne', onAdd)
+        added(+1);
+      }
+
+
+      else {
+        console.log('truyen vo ne')
+        added(-1);
+      }
+    }, [product]); // Hàm chỉ được tạo lại khi `count` thay đổi
+    return (
+      <Box
+        className="w-fit h-full px-2 pb-3 flex space-x-1 items-end col-span-1"
+      >
+        <Box role='button'
+          onClick={() => handleClick(false)}
+        >
+          <Icon
+            icon="zi-minus-circle-solid"
+            className={cx("h-6 w-6", getCurrentQuantity(product.sku) > 0 ? "text-primary" : 'text-slate-200')}
+          />
+        </Box>
+        <span className="text-slate-4001 font-semibold">{getCurrentQuantity(product.sku)}</span>
+        <Box onClick={() => handleClick(true)} role='button'>
+          <Icon
+            icon="zi-plus-circle-solid"
+            className="h-6 w-6 text-primary"
+          />
+        </Box>
+      </Box>
+    )
+  }
+
   return (
     <ProductPicker product={product} >
       {({ open, added }) => (
@@ -36,9 +83,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
               </Box>
             </Box>
           </Box>
-          <Box className="w-fit h-full px-2 pb-3 flex items-end col-span-1" role="button" onClick={added}>
-            <Icon icon="zi-plus-circle-solid" className="h-6 w-6 text-primary" />
-          </Box>
+          <AddButton added={added} />
         </Box>
       )}
     </ProductPicker>

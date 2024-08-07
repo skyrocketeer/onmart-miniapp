@@ -77,32 +77,32 @@ const CheckoutResultPage: FC = () => {
       <Page className="flex flex-col">
         <Header title="Kết quả thanh toán" />
         {(function (render: (result: RenderResultProps) => ReactNode) {
-          if ("resultCode" in paymentResult) {
-            if (paymentResult.resultCode === 1) {
+          // if ("resultCode" in paymentResult) {
+          //   if (paymentResult.resultCode === 1) {
               return render({
                 title: "Thanh toán thành công",
                 message: "Cảm ơn bạn đã mua hàng!",
                 orderInfo: paymentResult,
                 color: "#288F4E",
               });
-            }
-            if (paymentResult.resultCode === 0) {
-              return render({
-                title: "Thanh toán đang được xử lý",
-                message: `Nhà bán hàng đã nhận được yêu cầu thanh toán của bạn vào lúc ${fromMilisToDate(paymentResult.createdAt || 0)} và đang xử lý.`,
-                orderInfo: paymentResult,
-                color: "#F4AA39",
-              });
-            }
-          }
-          return render({
-            title: "Thanh toán thất bại",
-            message: `Đã có lỗi xảy ra trong quá trình thanh toán, vui lòng thử lại sau! Mã lỗi: ${JSON.stringify(
-              (paymentResult as AsyncCallbackFailObject).code
-            )}`,
-            orderInfo: paymentResult,
-            color: "#DC1F18",
-          });
+          //   }
+          //   if (paymentResult.resultCode === 0) {
+          //     return render({
+          //       title: "Thanh toán đang được xử lý",
+          //       message: `Nhà bán hàng đã nhận được yêu cầu thanh toán của bạn vào lúc ${fromMilisToDate(paymentResult.createdAt || 0)} và đang xử lý.`,
+          //       orderInfo: paymentResult,
+          //       color: "#F4AA39",
+          //     });
+          //   }
+          // }
+          // return render({
+          //   title: "Thanh toán thất bại",
+          //   message: `Đã có lỗi xảy ra trong quá trình thanh toán, vui lòng thử lại sau! Mã lỗi: ${JSON.stringify(
+          //     (paymentResult as AsyncCallbackFailObject).code
+          //   )}`,
+          //   orderInfo: paymentResult,
+          //   color: "#DC1F18",
+          // });
         })(({ title, message, color }: RenderResultProps) => (
           <Box className="px-4 py-16 space-y-4 flex-1 flex flex-col justify-center items-center text-center">
             <div
@@ -115,20 +115,21 @@ const CheckoutResultPage: FC = () => {
             >
               <img src={shieldCheckImg} className="w-20" />
             </div>
-            <Text.Title className={cx("font-bold", `text-[${color}]`)}>
+            {/* <Text.Title className={cx("font-bold", `text-[${color}]`)}>
               {title}
-            </Text.Title>
-            <Text>{message}</Text>
+            </Text.Title> */}
+            {/* <Text>{message}</Text> */}
+            <Text>Cảm ơn bạn đã mua hàng. Chúng tôi sẽ liên hệ bạn để xác nhận lại đơn hàng trong thời gian sớm nhất</Text>
             <Box flex className="space-x-16 pt-5">
               <Button variant="secondary" className="rounded-md bg-white text-[#288F4E] shadow-xl"
                 onClick={() => navigate('/')}>
                 Trang chủ
               </Button>
-              <Button variant="secondary" className="rounded-md bg-[#288F4E] text-white shadow-xl"
+              {/* <Button variant="secondary" className="rounded-md bg-[#288F4E] text-white shadow-xl"
                 onClick={() => navigate('/cart')}
               >
                 Đơn đã đặt
-              </Button>
+              </Button> */}
             </Box>
           </Box>
         ))}

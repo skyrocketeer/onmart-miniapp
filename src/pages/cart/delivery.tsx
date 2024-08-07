@@ -53,12 +53,12 @@ export const Delivery = () => {
               <Box flex flexDirection="column" className="space-y-4">
                 <Box flex flexDirection="column"
                   className="border bg-slate-200 border-slate-200 mx-2 p-3 rounded-lg shadow-md gap-2"
-                  role='button'
-                  onClick={() => setShipType(ShipType.AT_STORE)}
+                  // role='button'
+                  // onClick={() => setShipType(ShipType.AT_STORE)}
                 >
                   <Text size="small" className="font-semibold text-slate-400">Đến lấy tại cửa hàng</Text>
                   <Box flex alignItems="center" className="space-x-4">
-                    <Icon icon={ShipType.AT_STORE == shipType ? "zi-radio-checked" : "zi-radio-unchecked"} size={18} />
+                    <Icon icon="zi-radio-unchecked" size={18} />
                     <Suspense fallback={<RequestStorePickerLocation />}>
                       <StorePicker />
                     </Suspense>
@@ -70,16 +70,16 @@ export const Delivery = () => {
                   onClick={() => setShipType(ShipType.AT_DOOR)}
                 >
                   <Text size="small" className="font-semibold text-slate-400">
-                    Đến lấy tại cửa hàng
+                    Nhận hàng tại địa chỉ
                   </Text>
                   <Box flex alignItems="center" className="space-x-4">
-                    <Icon icon={ShipType.AT_DOOR == shipType ? "zi-radio-checked" : "zi-radio-unchecked"} size={18} />
+                    <Icon icon="zi-radio-checked" size={18} />
                     <Input placeholder="Nhập địa chỉ"
                       name="address"
                       className="text-sm"
                       size="small"
-                      disabled={shipType !== ShipType.AT_DOOR ? true : false}
-                      value={shipInfo.shippingAddressText || shipAddress}
+                      // disabled={shipType !== ShipType.AT_DOOR ? true : false}
+                      value={shipAddress}
                       onChange={handleInputChange}
                     />
                   </Box>

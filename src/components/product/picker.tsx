@@ -21,7 +21,7 @@ export interface ProductPickerProps {
   children: (methods: {
     open: () => void;
     close: () => void;
-    added?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+    added: (amount: number) => void;
   }) => ReactNode;
 }
 
@@ -62,6 +62,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
       setCart((cart) => {
         let res = [...cart];
         if (selected) {
+          console.log('1');
           // updating an existing cart item, including quantity and size, or remove it if new quantity is 0
           const editing = cart.find(
             (item) =>
@@ -93,12 +94,15 @@ export const ProductPicker: FC<ProductPickerProps> = ({
               item.product.sku === product.sku &&
               isIdentical(item.options, options),
           );
+          console.log('2')
           if (existed) {
+            console.log('4 ', quantity)
             res.splice(cart.indexOf(existed), 1, {
               ...existed,
               quantity: existed.quantity + quantity,
             });
           } else {
+            console.log('3')
             res = res.concat({
               product,
               options,
@@ -112,7 +116,8 @@ export const ProductPicker: FC<ProductPickerProps> = ({
     setVisible(false);
   };
 
-  const handleAddToCartNow = () => {
+  const handleAddToCartNow = (quantity: number) => {
+    setQuantity(quantity)
     addToCart()
   }
 
@@ -121,7 +126,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
       {children({
         open: () => setVisible(true),
         close: () => setVisible(false),
-        added: (e) => handleAddToCartNow()
+        added: (amount: number) => handleAddToCartNow(amount)
       })}
 
       {createPortal(
