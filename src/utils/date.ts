@@ -42,17 +42,5 @@ export function fromMilisToDate(milis:number) {
   const hour = padToTwoDigits(date.getHours());
   const minute = padToTwoDigits(date.getMinutes());
   const second = padToTwoDigits(date.getSeconds());
-  const formattedDate = new Intl.DateTimeFormat('vi-VN', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    timeZoneName: 'short'
-  }).format(date);
-
-  // Return manually formatted date with locale-based weekday and month names
   return `${day}/${month}/${year} ${hour}:${minute}:${second}`;
 }

@@ -19,25 +19,21 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
   }
 
   const AddButton = ({ added }: { added: Function }) => {
-    const handleClick = useCallback((onAdd: boolean) => {
-      console.log("htrue false", onAdd)
+    const handleClick = (onAdd: boolean, sku: string) => {
       if (onAdd) {
-        console.log('truyen vo ne', onAdd)
         added(+1);
       }
-
-
       else {
-        console.log('truyen vo ne')
-        added(-1);
+        if (getCurrentQuantity(sku) > 0)
+          added(-1);
       }
-    }, [product]); // Hàm chỉ được tạo lại khi `count` thay đổi
+    }; // Hàm chỉ được tạo lại khi `count` thay đổi
     return (
       <Box
         className="w-fit h-full px-2 pb-3 flex space-x-1 items-end col-span-1"
       >
         <Box role='button'
-          onClick={() => handleClick(false)}
+          onClick={() => handleClick(false, product.sku)}
         >
           <Icon
             icon="zi-minus-circle-solid"
@@ -45,7 +41,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
           />
         </Box>
         <span className="text-slate-4001 font-semibold">{getCurrentQuantity(product.sku)}</span>
-        <Box onClick={() => handleClick(true)} role='button'>
+        <Box onClick={() => handleClick(true, product.sku)} role='button'>
           <Icon
             icon="zi-plus-circle-solid"
             className="h-6 w-6 text-primary"

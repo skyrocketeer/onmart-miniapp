@@ -1,6 +1,6 @@
 import { FinalPrice } from "components/display/final-price";
 import { Sheet } from "components/fullscreen-sheet";
-import React, { FC, ReactNode, useEffect, useState } from "react";
+import React, { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSetRecoilState } from "recoil";
 import { cartState } from "state";
@@ -53,16 +53,16 @@ export const ProductPicker: FC<ProductPickerProps> = ({
   useEffect(() => {
     if (selected) {
       setOptions(selected.options);
-      setQuantity(selected.quantity);
+      // setQuantity(selected.quantity);
     }
   }, [selected]);
 
-  const addToCart = () => {
+  const addToCart = (quantity = 0) => {
     if (product) {
       setCart((cart) => {
         let res = [...cart];
         if (selected) {
-          console.log('1');
+          console.log('select', selected);
           // updating an existing cart item, including quantity and size, or remove it if new quantity is 0
           const editing = cart.find(
             (item) =>
@@ -94,15 +94,12 @@ export const ProductPicker: FC<ProductPickerProps> = ({
               item.product.sku === product.sku &&
               isIdentical(item.options, options),
           );
-          console.log('2')
           if (existed) {
-            console.log('4 ', quantity)
             res.splice(cart.indexOf(existed), 1, {
               ...existed,
               quantity: existed.quantity + quantity,
             });
           } else {
-            console.log('3')
             res = res.concat({
               product,
               options,
@@ -118,7 +115,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
 
   const handleAddToCartNow = (quantity: number) => {
     setQuantity(quantity)
-    addToCart()
+    addToCart(quantity)
   }
 
   return (
@@ -126,7 +123,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
       {children({
         open: () => setVisible(true),
         close: () => setVisible(false),
-        added: (amount: number) => handleAddToCartNow(amount)
+        added: handleAddToCartNow
       })}
 
       {createPortal(
@@ -182,7 +179,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                     variant={quantity > 0 ? "primary" : "secondary"}
                     type={quantity > 0 ? "highlight" : "neutral"}
                     fullWidth
-                    onClick={addToCart}
+                    onClick={(e) => addToCart}
                   >
                     {quantity > 0
                       ? selected
@@ -196,7 +193,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                     variant="primary"
                     type="highlight"
                     fullWidth
-                    onClick={addToCart}
+                      onClick={(e) => addToCart}
                   >
                     Thêm vào giỏ hàng
                   </Button>

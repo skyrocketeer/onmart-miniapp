@@ -1,4 +1,4 @@
-import { atom, selector, selectorFamily, useRecoilValue } from "recoil";
+import { atom, selector, selectorFamily } from "recoil";
 import logo from "static/logo.png";
 import subscriptionIcon from "static/subscription-decor.svg";
 import { Cart } from "types/cart";
@@ -9,6 +9,7 @@ import { ShippingData } from "types/order";
 import { Product } from "types/product";
 import { wait } from "utils/async";
 import { API_URL } from "utils/constant";
+import { fromMilisToDate } from "utils/date";
 import { calculateDistance } from "utils/location";
 import { calcFinalPrice } from "utils/price";
 import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
@@ -334,7 +335,7 @@ export const phoneState = selector<string>({
 export const defaultShippingState = {
   clientName: "",
   phoneNumber: "",
-  shippingTime: new Date().toLocaleTimeString("vi-VN"),
+  shippingTime: new Date().getTime(),
   shippingAddressCoord: {
     latitude: 0,
     longitude: 0,

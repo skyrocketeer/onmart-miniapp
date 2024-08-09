@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
 import { displayDate, displayHalfAnHourTimeRange, fromMilisToDate } from "utils/date";
@@ -6,9 +6,9 @@ import { matchStatusBarColor } from "utils/device";
 import { Picker } from "zmp-ui";
 
 export const TimePicker: FC = () => {
-  const [date, setDate] = useState(+new Date());
-  const [time, setTime] = useState(+new Date());
   const [globalState, setGlobalState] = useRecoilState(shippingInfoState)
+  const [date, setDate] = useState(+new Date());
+  const [milis, setMilis] = useState(globalState.shippingTime);
 
   const availableDates = useMemo(() => {
     const days: Date[] = [];
@@ -60,11 +60,11 @@ export const TimePicker: FC = () => {
       title="Thời gian nhận hàng"
       value={{
         date,
-        time: availableTimes.find((t) => +t === time)
-          ? time
+        time: availableTimes.find((t) => +t === milis)
+          ? milis
           : +availableTimes[0],
       }}
-      formatPickedValueDisplay={({ date, time }) =>
+      formatPickedValueDisplay={({ date, time }) => 
         date && time
           ? `${displayHalfAnHourTimeRange(new Date(time.value))}, ${displayDate(
               new Date(date.value),
@@ -76,7 +76,7 @@ export const TimePicker: FC = () => {
           setDate(+date.value);
         }
         if (time) {
-          setTime(+time.value);
+          setMilis(+time.value);
         }
       }}
       data={[
@@ -98,7 +98,7 @@ export const TimePicker: FC = () => {
       action={{
         text: "Chọn thời gian giao hàng này",
         onClick: (e) => {
-          setGlobalState({ ...globalState, shippingTime: fromMilisToDate(time) })
+          setGlobalState({ ...globalState, shippingTime: milis })
         },
         close: true
       }}
