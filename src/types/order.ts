@@ -1,3 +1,5 @@
+import { defaultShippingState } from "state"
+
 export interface OrderData {
   amount: number,
   method: Record<string, any>,
@@ -7,4 +9,7 @@ export interface OrderData {
   item: Record<string, any>[]
 }
 
-export type ShippingData = Record<string, any>
+type ShippingDataKey = keyof typeof defaultShippingState;
+type ShippingDataValues = typeof defaultShippingState[ShippingDataKey];
+
+export type ShippingData = Record<ShippingDataKey,ShippingDataValues>

@@ -1,19 +1,21 @@
-import { ElasticTextarea } from "components/elastic-textarea";
 import { ListRenderer } from "components/list-renderer";
-import React, { ChangeEvent, FC, ReactNode, Suspense, useEffect, useState } from "react";
+import React, { ChangeEvent, Suspense, useEffect, useState } from "react";
 import { Box, Icon, Input, Text } from "zmp-ui";
 import { PersonPicker, RequestPersonPickerPhone } from "./person-picker";
 import { RequestStorePickerLocation, StorePicker } from "./store-picker";
 import { TimePicker } from "./time-picker";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
+import { getErrorMessage } from "utils/form-validation";
+import { useFormContext } from "react-hook-form";
 
 enum ShipType {
   AT_DOOR = "D2D",
   AT_STORE = "PICKUP",
 }
 
-export const Delivery = () => {
+export const Delivery = ({ register, control }: { register: any, control: any }) => {
+  // const { register, formState: { errors }, clearErrors } = useFormContext();
   const [shipInfo, setShipInfo] = useRecoilState(shippingInfoState);
   const [shipType, setShipType] = useState(ShipType.AT_DOOR)
   const [shipAddress, setShipAddress] = useState("")
@@ -30,7 +32,7 @@ export const Delivery = () => {
     }
   }
 
-  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     if (name == "note") {
       setNote(value)
@@ -39,6 +41,8 @@ export const Delivery = () => {
     else {
       setShipAddress(event.target.value)
       updateShipInfo("shippingAddressText", event.target.value)
+      // const result = await clearErrors('shippingAddressText');
+      // console.log('r', result)
     }
   };
 
@@ -70,19 +74,20 @@ export const Delivery = () => {
                   onClick={() => setShipType(ShipType.AT_DOOR)}
                 >
                   <Text size="small" className="font-semibold text-slate-400">
-                    Nhận hàng tại địa chỉ
+                    Nhận hàng tại địa chỉ <sup className="text-red-600">*</sup>
                   </Text>
                   <Box flex alignItems="center" className="space-x-4">
                     <Icon icon="zi-radio-checked" size={18} />
                     <Input placeholder="Nhập địa chỉ"
-                      name="address"
                       className="text-sm"
                       size="small"
                       // disabled={shipType !== ShipType.AT_DOOR ? true : false}
-                      value={shipAddress}
-                      onChange={handleInputChange}
+                      {...register('shippingAddressText', { required: 'Địa chỉ là bắt buộc' })}
+                      // value={shipInfo.shippingAddressText as string || shipAddress}
+                      // onChange={handleInputChange}
                     />
                   </Box>
+                  {/* {errors.shippingAddressText && <div className="text-xs text-red-600 ml-10 mt-[-8px]">{getErrorMessage(errors.shippingAddressText)}</div>} */}
                 </Box>
               </Box>
             ),
@@ -117,7 +122,7 @@ export const Delivery = () => {
                   name="note"
                   placeholder="Nhập ghi chú..."
                   className="border-none px-0 w-full focus:outline-none"
-                  value={shipInfo.note || note}
+                  value={shipInfo.note as string || note}
                   onChange={handleInputChange}
                 />
               </Box>

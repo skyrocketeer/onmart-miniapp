@@ -1,13 +1,14 @@
 import { DisplayPrice } from "components/display/price";
 import { useCreateOrder } from "hooks";
-import React, { FC, useState } from "react";
+import { useForm, SubmitHandler, useFormContext } from 'react-hook-form';
+import React, { FC, useEffect, useState } from "react";
 import { useRecoilState, useRecoilValue, useResetRecoilState } from "recoil";
-import { cartState, defaultShippingState, shippingInfoState, totalPriceState, totalQuantityState } from "state";
-import { OrderData } from "types/order";
+import { cartState, shippingInfoState, totalPriceState, totalQuantityState } from "state";
+import { OrderData, ShippingData } from "types/order";
 import { v4 as uuidv4 } from 'uuid';
 import { Box, Button, Text, useNavigate } from "zmp-ui";
 
-export const CartPreview: FC = () => {
+export const CartPreview = () => {
   const quantity = useRecoilValue(totalQuantityState);
   const totalPrice = useRecoilValue(totalPriceState);
   const cart = useRecoilValue(cartState);
@@ -16,6 +17,12 @@ export const CartPreview: FC = () => {
   const shippingInfo = useRecoilValue(shippingInfoState)
   const resetShipDataState = useResetRecoilState(shippingInfoState)
   const resetOrderDataState = useResetRecoilState(cartState)
+  const { handleSubmit, formState: { errors, isValid } } = useFormContext()
+
+  console.log(errors)
+  useEffect(() => {
+    console.log('asssss')
+  }, [errors])
 
   const generateMacData = () => {
     const tid = uuidv4()
@@ -39,24 +46,19 @@ export const CartPreview: FC = () => {
         id: "COD",
         isCustom: false,
       },
-      quantity: quantity,
+      quantity,
       item: listOrderItem
     } as OrderData
   }
 
-  const handleCreateOrder = async () => {
-    setIsSubmitting(true)
-    await useCreateOrder(generateMacData(), shippingInfo, (orderId: string) => {
-      try {
-        setIsSubmitting(false)
-        navigate(`/result${location.search}`)
-      } catch (err) {
-        console.log('payment err ', err)
-      }
-    })
-    resetOrderDataState()
-    resetShipDataState()
-  }
+  // Custom validation function
+  const validateOrder = (data: ShippingData) => {
+    const errors: any = {};
+    if (!data.shippingAddressText) {
+      errors.address = 'Shipping address is required';
+    }
+    return errors;
+  };
 
   return (
     <Box flex className="sticky bottom-0 bg-background p-4 space-x-4">
@@ -74,10 +76,10 @@ export const CartPreview: FC = () => {
         </Text.Title>
       </Box>
       <Button
-        type="highlight"
-        disabled={!quantity || isSubmitting}
         fullWidth
-        onClick={handleCreateOrder}
+        type="highlight"
+        disabled={!quantity}
+        htmlType="submit"
       >
         Đặt hàng
       </Button>

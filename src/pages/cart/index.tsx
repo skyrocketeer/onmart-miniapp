@@ -2,13 +2,16 @@ import PaymentCard, { PAYMENT_OPTION } from "components/card/payment-method";
 import { Divider } from "components/divider";
 import { SecondaryLayout } from "components/layout/layout-secondary";
 import { useVirtualKeyboardVisible } from "hooks";
-import React, { FC, ReactNode, useState } from "react";
+import React, { FC, useState } from "react";
 import cx from "utils/helpers";
 import { Box, Header, Icon, Text } from "zmp-ui";
 import { CartItems } from "./cart-items";
 import { Delivery } from "./delivery";
 import { CartPreview } from "./preview";
 import { TermsAndPolicies } from "./term-and-policies";
+import { ShippingData } from "types/order";
+import { defaultShippingState } from "state";
+import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -17,6 +20,15 @@ type PaymentMethodProps = {
 }
 
 const CartPage: FC = () => {
+  // React Hook Form setup
+  const methods = useForm<ShippingData>({
+    defaultValues: defaultShippingState,
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+    shouldFocusError: true
+  });
+  const { handleSubmit, register, control } = methods
+
   const keyboardVisible = useVirtualKeyboardVisible();
 
   const PaymentOptions = () => {
@@ -69,18 +81,55 @@ const CartPage: FC = () => {
     )
   }
 
+  const handleCreateOrder: SubmitHandler<ShippingData> = async (data: ShippingData) => {
+    console.log(data)
+    // setIsSubmitting(true)
+
+    // const validationErrors = validateOrder(data);
+    // console.log('Validation errors:', validationErrors);
+
+    // if (Object.keys(validationErrors).length > 0) {
+    //   console.log('Validation errors:', validationErrors);
+    //   return;
+    // }
+
+    // if (!quantity || cart.length === 0) {
+    //   console.log('Cart is empty or quantity is invalid');
+    //   return;
+    // }
+
+    // setIsSubmitting(true)
+    //   await useCreateOrder(generateMacData(), shippingInfo, (orderId: string) => {
+    //     try {
+    //       setIsSubmitting(false)
+    //       navigate(`/result${location.search}`)
+    //     } catch (err) {
+    //       console.log('payment err ', err)
+    //     }
+    //   })
+    //   resetOrderDataState()
+    //   resetShipDataState()
+  }
+
   return (
-    <SecondaryLayout>
-      <Header title="Giỏ hàng" showBackIcon={false} />
-      <CartItems />
-      <Delivery />
-      <Divider size={12} />
-      <PaymentOptions />
-      <Divider size={12} />
-      <TermsAndPolicies />
-      <Divider size={32} className="flex-1" />
-      {!keyboardVisible && <CartPreview />}
-    </SecondaryLayout>
+    <FormProvider {...methods}>
+      <SecondaryLayout>
+        <form onSubmit={handleSubmit(handleCreateOrder)}>
+          <Header title="Giỏ hàng" showBackIcon={false} />
+          <CartItems />
+          <Delivery
+            register={register}
+            control={control}
+          />
+          <Divider size={12} />
+          <PaymentOptions />
+          <Divider size={12} />
+          <TermsAndPolicies />
+          <Divider size={32} className="flex-1" />
+          {!keyboardVisible && <CartPreview />}
+        </form>
+      </SecondaryLayout>
+    </FormProvider>
   );
 };
 
