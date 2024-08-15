@@ -7,15 +7,14 @@ import { TimePicker } from "./time-picker";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
 import { getErrorMessage } from "utils/form-validation";
-import { useFormContext } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 enum ShipType {
   AT_DOOR = "D2D",
   AT_STORE = "PICKUP",
 }
 
-export const Delivery = ({ register, control }: { register: any, control: any }) => {
-  // const { register, formState: { errors }, clearErrors } = useFormContext();
+export const Delivery = ({ register, control ,errors}: { register: any, control: any,errors: any}) => {
   const [shipInfo, setShipInfo] = useRecoilState(shippingInfoState);
   const [shipType, setShipType] = useState(ShipType.AT_DOOR)
   const [shipAddress, setShipAddress] = useState("")
@@ -32,6 +31,7 @@ export const Delivery = ({ register, control }: { register: any, control: any })
     }
   }
 
+
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     if (name == "note") {
@@ -45,7 +45,6 @@ export const Delivery = ({ register, control }: { register: any, control: any })
       // console.log('r', result)
     }
   };
-
   return (
     <Box className="space-y-3 px-4">
       <Text.Header>Hình thức nhận hàng</Text.Header>
@@ -57,8 +56,8 @@ export const Delivery = ({ register, control }: { register: any, control: any })
               <Box flex flexDirection="column" className="space-y-4">
                 <Box flex flexDirection="column"
                   className="border bg-slate-200 border-slate-200 mx-2 p-3 rounded-lg shadow-md gap-2"
-                  // role='button'
-                  // onClick={() => setShipType(ShipType.AT_STORE)}
+                // role='button'
+                // onClick={() => setShipType(ShipType.AT_STORE)}
                 >
                   <Text size="small" className="font-semibold text-slate-400">Đến lấy tại cửa hàng</Text>
                   <Box flex alignItems="center" className="space-x-4">
@@ -78,16 +77,33 @@ export const Delivery = ({ register, control }: { register: any, control: any })
                   </Text>
                   <Box flex alignItems="center" className="space-x-4">
                     <Icon icon="zi-radio-checked" size={18} />
-                    <Input placeholder="Nhập địa chỉ"
-                      className="text-sm"
-                      size="small"
-                      // disabled={shipType !== ShipType.AT_DOOR ? true : false}
-                      {...register('shippingAddressText', { required: 'Địa chỉ là bắt buộc' })}
-                      // value={shipInfo.shippingAddressText as string || shipAddress}
-                      // onChange={handleInputChange}
+                    <Controller
+                      name={'shippingAddressText'}
+                      control={control}
+                      rules={{
+                        required: 'Shipping address is required',
+                      
+                      }}
+                      render={({ field: { value, onChange, onBlur } }) => (
+                        <Input placeholder="Nhập địa chỉ"
+                          className="text-sm"
+                          size="small"
+                          value={shipInfo.shippingAddressText || value}
+                          onChange={(event) => {
+                            onChange(event);
+                            handleInputChange(event)
+                          }}
+                        // disabled={shipType !== ShipType.AT_DOOR ? true : false}
+                        // value={shipInfo.shippingAddressText as string || shipAddress}
+                        // onChange={handleInputChange}
+
+                        />
+
+                      )}
                     />
+
                   </Box>
-                  {/* {errors.shippingAddressText && <div className="text-xs text-red-600 ml-10 mt-[-8px]">{getErrorMessage(errors.shippingAddressText)}</div>} */}
+                  {errors.shippingAddressText && <div className="text-xs text-red-600 ml-10 mt-[-8px]">{getErrorMessage(errors.shippingAddressText)}</div>}
                 </Box>
               </Box>
             ),
@@ -118,13 +134,29 @@ export const Delivery = ({ register, control }: { register: any, control: any })
             left: <Icon icon="zi-note" className="my-auto" />,
             right: (
               <Box flex>
-                <Input
-                  name="note"
-                  placeholder="Nhập ghi chú..."
-                  className="border-none px-0 w-full focus:outline-none"
-                  value={shipInfo.note as string || note}
-                  onChange={handleInputChange}
-                />
+              
+                   <Controller
+                      name={'Note'}
+                      control={control}
+                      // rules={{
+                      //   required: 'Shipping address is required',
+                      
+                      // }}
+                      render={({ field: { value, onChange, onBlur } }) => (
+                        <Input
+                        name="note"
+                        placeholder="Nhập ghi chú..."
+                        className="border-none px-0 w-full focus:outline-none"
+                        value={note || ''}
+                        onChange={(event) => {
+                          onChange(event);
+                          const { value: valueInput } = event.target;
+                          // handleInputChange(event)
+                        }}
+                      />
+
+                      )}
+                    />
               </Box>
             ),
           },

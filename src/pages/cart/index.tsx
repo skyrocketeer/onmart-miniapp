@@ -21,15 +21,18 @@ type PaymentMethodProps = {
 
 const CartPage: FC = () => {
   // React Hook Form setup
-  const methods = useForm<ShippingData>({
+  const methods = useForm<any>({
     defaultValues: defaultShippingState,
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true
   });
-  const { handleSubmit, register, control } = methods
+  const { handleSubmit, register, control ,watch, formState:{errors} } = methods
 
   const keyboardVisible = useVirtualKeyboardVisible();
+
+  console.log(watch('shippingAddressText'))
+  
 
   const PaymentOptions = () => {
     const [selectedMethod, setSelectedMethod] = useState<PAYMENT_OPTION>(PAYMENT_OPTION.COD);
@@ -61,6 +64,7 @@ const CartPage: FC = () => {
     };
 
     return (
+      
       <Box className="space-y-3 p-3">
         <Text.Header className="mt-1 mb-5">Phương thức thanh toán</Text.Header>
         {methods.map(method => (
@@ -81,7 +85,7 @@ const CartPage: FC = () => {
     )
   }
 
-  const handleCreateOrder: SubmitHandler<ShippingData> = async (data: ShippingData) => {
+  const handleCreateOrder = async (data: ShippingData) => {
     console.log(data)
     // setIsSubmitting(true)
 
@@ -112,7 +116,7 @@ const CartPage: FC = () => {
   }
 
   return (
-    <FormProvider {...methods}>
+    
       <SecondaryLayout>
         <form onSubmit={handleSubmit(handleCreateOrder)}>
           <Header title="Giỏ hàng" showBackIcon={false} />
@@ -120,6 +124,7 @@ const CartPage: FC = () => {
           <Delivery
             register={register}
             control={control}
+            errors={errors}
           />
           <Divider size={12} />
           <PaymentOptions />
@@ -129,7 +134,6 @@ const CartPage: FC = () => {
           {!keyboardVisible && <CartPreview />}
         </form>
       </SecondaryLayout>
-    </FormProvider>
   );
 };
 

@@ -17,12 +17,8 @@ export const CartPreview = () => {
   const shippingInfo = useRecoilValue(shippingInfoState)
   const resetShipDataState = useResetRecoilState(shippingInfoState)
   const resetOrderDataState = useResetRecoilState(cartState)
-  const { handleSubmit, formState: { errors, isValid } } = useFormContext()
 
-  console.log(errors)
-  useEffect(() => {
-    console.log('asssss')
-  }, [errors])
+
 
   const generateMacData = () => {
     const tid = uuidv4()
