@@ -14,6 +14,7 @@ import { cartState, shippingInfoState, totalPriceState, totalQuantityState } fro
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { v4 as uuidv4 } from 'uuid';
+import { fromMilisToDate } from "utils/date";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -64,7 +65,7 @@ const CartPage = () => {
         storeName: 'ONMART',
         orderGroupId: tid,
         myTransactionId: tid,
-        notes: "Test"
+        shippingFee: shippingInfo.shippingFee
       },
       method: {
         id: "COD",

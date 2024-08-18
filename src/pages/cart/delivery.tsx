@@ -72,7 +72,7 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
                   <Box flex alignItems="center" className="space-x-4">
                     <Icon className="text-white" icon="zi-radio-checked" size={18} />
                     <Controller
-                      name={'shippingAddressText'}
+                      name='shippingAddressText'
                       control={control}
                       rules={{
                         required: 'Không được để trống địa chỉ',
@@ -81,6 +81,7 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
                         <Input placeholder="Nhập địa chỉ"
                           className="text-sm"
                           size="small"
+                          value={value as string}
                           onChange={(event) => {
                             onChange(event);
                             handleInputChange(event)
@@ -124,9 +125,10 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
                 <Controller
                   name={'note'}
                   control={control}
-                  render={({ field: { onChange } }) => (
+                  render={({ field: { value, onChange } }) => (
                     <Input
                       name="note"
+                      value={value as string}
                       placeholder="Nhập ghi chú..."
                       className="border-none px-0 w-full focus:outline-none"
                       onChange={(event) => {

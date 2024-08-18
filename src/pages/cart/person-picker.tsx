@@ -85,8 +85,10 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                     message: 'Xin nhập đúng định dạng'
                   }
                 }}
-                render={({ field: { onChange } }) => (
-                  <Input name="clientName"
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    name="clientName"
+                    value={value as string}
                     onChange={(event) => {
                       onChange(event);
                       handleInputChange(event)
@@ -108,9 +110,10 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                     message: 'Xin nhập đúng số điện thoại (10 số)'
                   }
                 }}
-                render={({ field: { onChange } }) => (
+                render={({ field: { value, onChange } }) => (
                   <Input
                     name="phoneNumber"
+                    value={value as string}
                     onChange={(event) => {
                       onChange(event);
                       handleInputChange(event)

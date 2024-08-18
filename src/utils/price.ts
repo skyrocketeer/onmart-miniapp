@@ -78,9 +78,13 @@ export function isIdentical(
   return true;
 }
 
-export function splitByComma(price) {
+export function splitByComma(price: any) {
   // Convert price to number if it's a string
-  price = parseFloat(price);
+  const number = parseFloat(price);
+
+   if (isNaN(number)) {
+    return 0
+  }
 
   // Round the price to ensure it's a whole number
   let roundedPrice = Math.round(price * 100);

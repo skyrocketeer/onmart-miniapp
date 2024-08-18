@@ -9,7 +9,6 @@ import { ShippingData } from "types/order";
 import { Product } from "types/product";
 import { wait } from "utils/async";
 import { API_URL } from "utils/constant";
-import { fromMilisToDate } from "utils/date";
 import { calculateDistance } from "utils/location";
 import { calcFinalPrice } from "utils/price";
 import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
@@ -341,7 +340,8 @@ export const defaultShippingState = {
     longitude: 0,
   },
   shippingAddressText: "",
-  note: ""
+  note: "",
+  shippingFee: 20000
 }
 
 export const shippingInfoState = atom<ShippingData>({

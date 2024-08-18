@@ -4,17 +4,18 @@ import { convertStringToNumber } from "utils/helpers";
 
 export const DisplayPrice: FC<{ children: number, useCurrency?: boolean }> = ({ children, useCurrency }) => {
   const symbol = getConfig((config) => config.template.currencySymbol);
+  const roundedPrice = Math.floor(Math.round(children * 100) / 100)
   if (getConfig((config) => config.template.prefixCurrencySymbol)) {
     return (
       <>
         {symbol}
-        {children.toLocaleString()}
+        {roundedPrice.toLocaleString()}
       </>
     );
   } else {
     return (
       <>
-        {children.toLocaleString()}
+        {roundedPrice.toLocaleString()}
         {useCurrency ? symbol : null}
       </>
     );
