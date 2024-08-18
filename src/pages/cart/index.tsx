@@ -1,17 +1,19 @@
 import PaymentCard, { PAYMENT_OPTION } from "components/card/payment-method";
 import { Divider } from "components/divider";
 import { SecondaryLayout } from "components/layout/layout-secondary";
-import { useVirtualKeyboardVisible } from "hooks";
-import React, { FC, useState } from "react";
+import { useCreateOrder, useVirtualKeyboardVisible } from "hooks";
+import React, { useState } from "react";
 import cx from "utils/helpers";
-import { Box, Header, Icon, Text } from "zmp-ui";
+import { Box, Header, Icon, Text, useNavigate } from "zmp-ui";
 import { CartItems } from "./cart-items";
 import { Delivery } from "./delivery";
 import { CartPreview } from "./preview";
 import { TermsAndPolicies } from "./term-and-policies";
-import { ShippingData } from "types/order";
-import { defaultShippingState } from "state";
-import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
+import { OrderData, ShippingData } from "types/order";
+import { cartState, shippingInfoState, totalPriceState, totalQuantityState } from "state";
+import { useForm } from "react-hook-form";
+import { useRecoilValue, useResetRecoilState } from "recoil";
+import { v4 as uuidv4 } from 'uuid';
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -19,20 +21,59 @@ type PaymentMethodProps = {
   isOn: boolean,
 }
 
-const CartPage: FC = () => {
+const CartPage = () => {
+  const navigate = useNavigate();
+  const quantity = useRecoilValue(totalQuantityState);
+  const totalPrice = useRecoilValue(totalPriceState);
+  const cart = useRecoilValue(cartState);
+  const shippingInfo = useRecoilValue(shippingInfoState)
+  const resetShipDataState = useResetRecoilState(shippingInfoState)
+  const resetOrderDataState = useResetRecoilState(cartState)
+
   // React Hook Form setup
-  const methods = useForm<any>({
-    defaultValues: defaultShippingState,
+  const methods = useForm<ShippingData>({
+    defaultValues: {
+      clientName: shippingInfo.clientName,
+      phoneNumber: shippingInfo.phoneNumber,
+      shippingTime: shippingInfo.shippingTime,
+      shippingAddressText: shippingInfo.shippingAddressText,
+      note: shippingInfo.note
+    },
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true
   });
-  const { handleSubmit, register, control ,watch, formState:{errors} } = methods
+  const { handleSubmit, control, formState: { errors, isSubmitting } } = methods
 
   const keyboardVisible = useVirtualKeyboardVisible();
 
-  console.log(watch('shippingAddressText'))
-  
+  const generateMacData = () => {
+    const tid = uuidv4()
+    const listOrderItem: Record<string, any>[] = []
+    cart.forEach(item => {
+      listOrderItem.push({
+        sku: item.product.sku,
+        name: item.product.name,
+        quantity: item.quantity
+      })
+    })
+
+    return {
+      amount: totalPrice,
+      extraData: {
+        storeName: 'ONMART',
+        orderGroupId: tid,
+        myTransactionId: tid,
+        notes: "Test"
+      },
+      method: {
+        id: "COD",
+        isCustom: false,
+      },
+      quantity,
+      item: listOrderItem
+    } as OrderData
+  }
 
   const PaymentOptions = () => {
     const [selectedMethod, setSelectedMethod] = useState<PAYMENT_OPTION>(PAYMENT_OPTION.COD);
@@ -64,7 +105,6 @@ const CartPage: FC = () => {
     };
 
     return (
-      
       <Box className="space-y-3 p-3">
         <Text.Header className="mt-1 mb-5">Phương thức thanh toán</Text.Header>
         {methods.map(method => (
@@ -86,54 +126,41 @@ const CartPage: FC = () => {
   }
 
   const handleCreateOrder = async (data: ShippingData) => {
-    console.log(data)
-    // setIsSubmitting(true)
+    if (!quantity || cart.length === 0) {
+      console.log('Cart is empty or quantity is invalid');
+      return;
+    }
 
-    // const validationErrors = validateOrder(data);
-    // console.log('Validation errors:', validationErrors);
-
-    // if (Object.keys(validationErrors).length > 0) {
-    //   console.log('Validation errors:', validationErrors);
-    //   return;
-    // }
-
-    // if (!quantity || cart.length === 0) {
-    //   console.log('Cart is empty or quantity is invalid');
-    //   return;
-    // }
-
-    // setIsSubmitting(true)
-    //   await useCreateOrder(generateMacData(), shippingInfo, (orderId: string) => {
-    //     try {
-    //       setIsSubmitting(false)
-    //       navigate(`/result${location.search}`)
-    //     } catch (err) {
-    //       console.log('payment err ', err)
-    //     }
-    //   })
-    //   resetOrderDataState()
-    //   resetShipDataState()
+    await useCreateOrder(generateMacData(), shippingInfo, (orderId: string) => {
+      try {
+        resetOrderDataState()
+        resetShipDataState()
+        navigate(`/result${location.search}`)
+      } catch (err) {
+        console.log('payment err ', err)
+      }
+    })
   }
 
   return (
-    
-      <SecondaryLayout>
-        <form onSubmit={handleSubmit(handleCreateOrder)}>
-          <Header title="Giỏ hàng" showBackIcon={false} />
-          <CartItems />
-          <Delivery
-            register={register}
-            control={control}
-            errors={errors}
-          />
-          <Divider size={12} />
-          <PaymentOptions />
-          <Divider size={12} />
-          <TermsAndPolicies />
-          <Divider size={32} className="flex-1" />
-          {!keyboardVisible && <CartPreview />}
-        </form>
-      </SecondaryLayout>
+    <SecondaryLayout>
+      <form onSubmit={handleSubmit(handleCreateOrder)}>
+        <Header title="Giỏ hàng" showBackIcon={false} />
+        <CartItems />
+        <Delivery
+          control={control}
+          errors={errors}
+        />
+        <Divider size={12} />
+        <PaymentOptions />
+        <Divider size={12} />
+        <TermsAndPolicies />
+        <Divider size={32} className="flex-1" />
+        {!keyboardVisible &&
+          <CartPreview isSubmitting={isSubmitting} />
+        }
+      </form>
+    </SecondaryLayout>
   );
 };
 

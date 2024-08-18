@@ -46,7 +46,6 @@ export const TimePicker: FC = () => {
       times.push(new Date(time));
       time.setMinutes(time.getMinutes() + 30);
     }
-
     return times;
   }, [date]);
 
@@ -65,10 +64,9 @@ export const TimePicker: FC = () => {
           : +availableTimes[0],
       }}
       formatPickedValueDisplay={({ date, time }) => 
-        date && time
-          ? `${displayHalfAnHourTimeRange(new Date(time.value))}, ${displayDate(
-              new Date(date.value),
-            )}`
+        time
+          ? displayHalfAnHourTimeRange(new Date(time.value))
+        // `${displayHalfAnHourTimeRange(new Date(time.value))}, ${displayDate(new Date(date.value),)}`
           : `Chọn thời gian`
       }
       onChange={({ date, time }) => {
@@ -87,13 +85,13 @@ export const TimePicker: FC = () => {
           })),
           name: "time",
         },
-        {
-          options: availableDates.map((date, i) => ({
-            displayName: displayDate(date, true),
-            value: +date,
-          })),
-          name: "date",
-        },
+        // {
+        //   options: availableDates.map((date, i) => ({
+        //     displayName: displayDate(date, true),
+        //     value: +date,
+        //   })),
+        //   name: "date",
+        // },
       ]}
       action={{
         text: "Chọn thời gian giao hàng này",

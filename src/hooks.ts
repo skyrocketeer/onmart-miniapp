@@ -5,7 +5,7 @@ import { generateMac } from "utils/helpers";
 import { EventName, events, Payment } from "zmp-sdk";
 import { useNavigate, useSnackbar } from "zmp-ui";
 import { OrderData, ShippingData } from './types/order';
-import { fromMilisToDate } from "utils/date";
+import { displayTime, fromMilisToDate } from "utils/date";
 
 export function useMatchStatusTextColor(visible?: boolean) {
   const changedRef = useRef(false);
@@ -37,7 +37,9 @@ export function useVirtualKeyboardVisible() {
 }
 
 export const useCreateOrder = async (orderData: OrderData, shippingData: ShippingData, callback: Function) => {
-  const mutableShippingData = {...shippingData, shippingTime: fromMilisToDate(shippingData.shippingTime)}
+  const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
+  const mutableShippingData = {...shippingData, shippingTime: 
+    `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
   const mac = await generateMac(orderData, mutableShippingData)
   await Payment.createOrder({
     desc:
