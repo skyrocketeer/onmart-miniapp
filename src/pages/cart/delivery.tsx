@@ -7,19 +7,17 @@ import { TimePicker } from "./time-picker";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
 import { getErrorMessage } from "utils/form-validation";
-import { useFormContext } from "react-hook-form";
+import { Control, Controller, FieldErrors } from "react-hook-form";
+import { ShippingData } from "types/order";
 
 enum ShipType {
   AT_DOOR = "D2D",
   AT_STORE = "PICKUP",
 }
 
-export const Delivery = ({ register, control }: { register: any, control: any }) => {
-  // const { register, formState: { errors }, clearErrors } = useFormContext();
+export const Delivery = ({ control, errors }: { control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
   const [shipInfo, setShipInfo] = useRecoilState(shippingInfoState);
   const [shipType, setShipType] = useState(ShipType.AT_DOOR)
-  const [shipAddress, setShipAddress] = useState("")
-  const [note, setNote] = useState("")
 
   useEffect(() => {
     if (shipType == ShipType.AT_STORE)
@@ -35,17 +33,12 @@ export const Delivery = ({ register, control }: { register: any, control: any })
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     if (name == "note") {
-      setNote(value)
-      updateShipInfo("note", event.target.value)
+      updateShipInfo("note", value)
     }
     else {
-      setShipAddress(event.target.value)
-      updateShipInfo("shippingAddressText", event.target.value)
-      // const result = await clearErrors('shippingAddressText');
-      // console.log('r', result)
+      updateShipInfo("shippingAddressText", value)
     }
   };
-
   return (
     <Box className="space-y-3 px-4">
       <Text.Header>Hình thức nhận hàng</Text.Header>
@@ -57,8 +50,8 @@ export const Delivery = ({ register, control }: { register: any, control: any })
               <Box flex flexDirection="column" className="space-y-4">
                 <Box flex flexDirection="column"
                   className="border bg-slate-200 border-slate-200 mx-2 p-3 rounded-lg shadow-md gap-2"
-                  // role='button'
-                  // onClick={() => setShipType(ShipType.AT_STORE)}
+                // role='button'
+                // onClick={() => setShipType(ShipType.AT_STORE)}
                 >
                   <Text size="small" className="font-semibold text-slate-400">Đến lấy tại cửa hàng</Text>
                   <Box flex alignItems="center" className="space-x-4">
@@ -69,25 +62,35 @@ export const Delivery = ({ register, control }: { register: any, control: any })
                   </Box>
                 </Box>
                 <Box flex flexDirection="column"
-                  className="border bg-slate-200 border-slate-200 mx-2 p-3 rounded-lg shadow-md gap-2"
+                  className="bg-primary mx-2 p-3 rounded-md shadow-2xl gap-2"
                   role='button'
                   onClick={() => setShipType(ShipType.AT_DOOR)}
                 >
-                  <Text size="small" className="font-semibold text-slate-400">
+                  <Text size="small" className="font-semibold text-white">
                     Nhận hàng tại địa chỉ <sup className="text-red-600">*</sup>
                   </Text>
                   <Box flex alignItems="center" className="space-x-4">
-                    <Icon icon="zi-radio-checked" size={18} />
-                    <Input placeholder="Nhập địa chỉ"
-                      className="text-sm"
-                      size="small"
-                      // disabled={shipType !== ShipType.AT_DOOR ? true : false}
-                      {...register('shippingAddressText', { required: 'Địa chỉ là bắt buộc' })}
-                      // value={shipInfo.shippingAddressText as string || shipAddress}
-                      // onChange={handleInputChange}
+                    <Icon className="text-white" icon="zi-radio-checked" size={18} />
+                    <Controller
+                      name={'shippingAddressText'}
+                      control={control}
+                      rules={{
+                        required: 'Không được để trống địa chỉ',
+                      }}
+                      render={({ field: { value, onChange } }) => (
+                        <Input placeholder="Nhập địa chỉ"
+                          className="text-sm"
+                          size="small"
+                          onChange={(event) => {
+                            onChange(event);
+                            handleInputChange(event)
+                          }}
+                          // disabled={shipType !== ShipType.AT_DOOR ? true : false}
+                        />
+                      )}
                     />
                   </Box>
-                  {/* {errors.shippingAddressText && <div className="text-xs text-red-600 ml-10 mt-[-8px]">{getErrorMessage(errors.shippingAddressText)}</div>} */}
+                  {errors.shippingAddressText && <div className="text-xs text-orange-400 ml-9 mt-[-8px]">{getErrorMessage(errors.shippingAddressText)}</div>}
                 </Box>
               </Box>
             ),
@@ -109,8 +112,8 @@ export const Delivery = ({ register, control }: { register: any, control: any })
           {
             left: <Icon icon="zi-user" className="my-auto" />,
             right: (
-              <Suspense fallback={<RequestPersonPickerPhone />}>
-                <PersonPicker />
+              <Suspense>
+                <PersonPicker control={control} errors={errors} />
               </Suspense>
             ),
           },
@@ -118,12 +121,20 @@ export const Delivery = ({ register, control }: { register: any, control: any })
             left: <Icon icon="zi-note" className="my-auto" />,
             right: (
               <Box flex>
-                <Input
-                  name="note"
-                  placeholder="Nhập ghi chú..."
-                  className="border-none px-0 w-full focus:outline-none"
-                  value={shipInfo.note as string || note}
-                  onChange={handleInputChange}
+                <Controller
+                  name={'note'}
+                  control={control}
+                  render={({ field: { onChange } }) => (
+                    <Input
+                      name="note"
+                      placeholder="Nhập ghi chú..."
+                      className="border-none px-0 w-full focus:outline-none"
+                      onChange={(event) => {
+                        onChange(event);
+                        handleInputChange(event)
+                      }}
+                    />
+                  )}
                 />
               </Box>
             ),

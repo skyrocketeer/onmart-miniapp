@@ -33,11 +33,13 @@ function padToTwoDigits(num) {
   return num.toString().padStart(2, '0');
 }
 
-export function fromMilisToDate(milis:number) {
+export function fromMilisToDate(milis: number, isOnlyDate = false) {
   const date = new Date(milis);
-    const day = padToTwoDigits(date.getDate());
+  const day = padToTwoDigits(date.getDate());
   const month = padToTwoDigits(date.getMonth() + 1); // Months are 0-based
   const year = date.getFullYear();
+  if(isOnlyDate)
+    return `${day}/${month}/${year}`
   
   const hour = padToTwoDigits(date.getHours());
   const minute = padToTwoDigits(date.getMinutes());

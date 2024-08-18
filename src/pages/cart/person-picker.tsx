@@ -1,9 +1,12 @@
 import { ListItem } from "components/list-item";
 import React, { ChangeEvent, FC, MouseEventHandler, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { Control, Controller, FieldErrors } from "react-hook-form";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { requestPhoneTriesState, shippingInfoState } from "state";
-import cx, { isDigit } from "utils/helpers";
+import { ShippingData } from "types/order";
+import { getErrorMessage, phoneNumberRegex, unicodeAlphabetRegex } from "utils/form-validation";
+import cx from "utils/helpers";
 import { Box, Input, Sheet, Text } from "zmp-ui";
 
 type DeliveryInfo = {
@@ -16,24 +19,25 @@ const defaultValue = {
   phoneNumber: '',
 }
 
-export const PersonPicker: FC = () => {
+export const PersonPicker = ({ control, errors }:
+  { control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
   const [globalState, updateState] = useRecoilState(shippingInfoState);
   const handleChangeDeliveryInfo = (newData: DeliveryInfo) => {
     updateState({ ...globalState, ...newData })
   }
 
-  if (!globalState.phoneNumber) {
-    return <RequestPersonPickerPhone emitChangeDeliveryInfo={handleChangeDeliveryInfo} initialValue={defaultValue} />;
-  }
-
-  return <ListItem title={`${globalState.clientName} - ${globalState.phoneNumber}`} subtitle="Người nhận hàng" />;
+  return <RequestPersonPickerPhone
+    emitChangeDeliveryInfo={handleChangeDeliveryInfo}
+    initialValue={{ clientName: globalState.clientName as string, phoneNumber: globalState.phoneNumber as string }}
+    control={control}
+    errors={errors}
+  />
 };
 
-export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue = defaultValue }: { emitChangeDeliveryInfo?: Function, initialValue?: DeliveryInfo }) => {
+export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue = defaultValue, control, errors }:
+  { emitChangeDeliveryInfo?: Function, initialValue?: DeliveryInfo, control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
   const [visible, setVisible] = useState(false)
   const [formData, setFormData] = useState(initialValue);
-
-  const [errorMsg, setErrorMsg] = useState<string[]>([])
   const retry = useSetRecoilState(requestPhoneTriesState);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -51,32 +55,16 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
       emitChangeDeliveryInfo(formData)
   }
 
-  const validateInput = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-    if (name == "phone") {
-      if (!isDigit(value))
-        setErrorMsg([...errorMsg, "phone"])
-      else
-        setErrorMsg([])
-      return
-    }
-
-    if (name == "clientName") {
-      if (value.length > 0)
-        setErrorMsg([])
-      else setErrorMsg([...errorMsg, "clientName"])
-      return
-    }
-    setErrorMsg([])
-  }
-
   return (
     <>
-    <ListItem
+      <ListItem
         onClick={() => setVisible(true)}
         title={formData.phoneNumber ? `${formData.clientName || "Người nhận"} - ${formData.phoneNumber}` : "Chọn người nhận"}
         subtitle="Yêu cầu truy cập số điện thoại nếu tự điền thông tin"
       />
+      {(errors.clientName || errors.phoneNumber) &&
+        <div className="text-xs text-red-600 mt-1">Thông tin người nhận chưa chính xác</div>
+      }
       {createPortal(
         <Sheet visible={visible}
           onClose={() => setVisible(false)}
@@ -87,18 +75,51 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
               <span className="text-red-600 font-light text-sm"> (bắt buộc)</span>
             </Text>
             <Box>
-              <Input value={formData.clientName} name="clientName"
-                onChange={handleInputChange}
-                placeholder="Nhập tên người nhận" />
-              <Text size="xxxSmall" className="text-red-600">{errorMsg.filter(err => err === "clientName").length ? "Không được để trống tên người nhận" : ""}</Text>
+              <Controller
+                name='clientName'
+                control={control}
+                rules={{
+                  required: 'Không được để trống tên người nhận',
+                  pattern: {
+                    value: unicodeAlphabetRegex,
+                    message: 'Xin nhập đúng định dạng'
+                  }
+                }}
+                render={({ field: { onChange } }) => (
+                  <Input name="clientName"
+                    onChange={(event) => {
+                      onChange(event);
+                      handleInputChange(event)
+                    }}
+                    placeholder="Nhập tên người nhận"
+                  />
+                )}
+              />
+              {errors.clientName && <div className="text-xs text-red-600">{getErrorMessage(errors.clientName)}</div>}
             </Box>
             <Box>
-              <Input value={formData.phoneNumber} name="phoneNumber"
-                onChange={handleInputChange}
-                placeholder="Nhập số điện thoại người nhận"
-                onInput={validateInput}
+              <Controller
+                name='phoneNumber'
+                control={control}
+                rules={{
+                  required: 'Không được để trống số điện thoại người nhận',
+                  pattern: {
+                    value: phoneNumberRegex,
+                    message: 'Xin nhập đúng số điện thoại (10 số)'
+                  }
+                }}
+                render={({ field: { onChange } }) => (
+                  <Input
+                    name="phoneNumber"
+                    onChange={(event) => {
+                      onChange(event);
+                      handleInputChange(event)
+                    }}
+                    placeholder="Nhập số điện thoại người nhận"
+                  />
+                )}
               />
-              <Text size="xxxSmall" className="text-red-600">{errorMsg.filter(err => err === "phone").length ? "Xin hãy nhập đúng định dạng số điện thoại" : ""}</Text>
+              {errors.phoneNumber && <div className="text-xs text-red-600">{getErrorMessage(errors.phoneNumber)}</div>}
             </Box>
             <Box flex className="space-x-5 pt-6">
               <button className="rounded-xl text-white bg-primary py-2 px-2 font-semibold"
@@ -106,9 +127,8 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
               >
                 Điền thông tin của tôi
               </button>
-              <button className={cx(errorMsg.length ? "bg-slate-300 text-slate-200 border-slate-50" : "text-primary border-primary", "rounded-xl border  py-2 px-2 font-semibold")}
+              <button className="rounded-xl border border-primary text-primary bg-white py-2 px-2 font-semibold"
                 onClick={onChoosingLocation}
-                disabled={errorMsg.length > 0}
               >
                 Chọn thông tin nhận hàng này
               </button>
