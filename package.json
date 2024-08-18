@@ -15,7 +15,7 @@
     "Samsung >= 5"
   ],
   "scripts": {
-    "start": "NODE_ENV=prod zmp start",
+    "start": "zmp start",
     "deploy": "zmp deploy",
     "build:css": "postcss src/css/tailwind.css -o src/css/styles.css"
   },
