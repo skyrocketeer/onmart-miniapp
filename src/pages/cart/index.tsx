@@ -63,7 +63,7 @@ const CartPage = () => {
     return {
       amount: totalPrice,
       extraData: {
-        storeName: 'ONMART',
+        storeName: 'onMart',
         orderGroupId: tid,
         myTransactionId: tid,
         shippingFee: shippingInfo.shippingFee
