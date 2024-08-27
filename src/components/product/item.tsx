@@ -2,7 +2,7 @@ import { FinalPrice } from "components/display/final-price";
 import { DisplayPrice } from "components/display/price";
 import React, { FC, useCallback } from "react";
 import { Product } from "types/product";
-import { Box, Icon, Text } from "zmp-ui";
+import { Box, Icon, Input, Text } from "zmp-ui";
 import { ProductPicker } from "./picker";
 import cx, { convertStringToNumber } from "utils/helpers";
 import { useRecoilValue } from "recoil";
@@ -40,6 +40,9 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
             className={cx("h-6 w-6", getCurrentQuantity(product.sku) > 0 ? "text-primary" : 'text-slate-200')}
           />
         </Box>
+        {/* <Input
+          value={product.sku}
+        /> */}
         <span className="text-slate-4001 font-semibold">{getCurrentQuantity(product.sku)}</span>
         <Box onClick={() => handleClick(true, product.sku)} role='button'>
           <Icon

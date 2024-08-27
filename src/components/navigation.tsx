@@ -3,6 +3,7 @@ import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { BottomNavigation, Icon } from "zmp-ui";
 import { CartIcon } from "./cart-icon";
+import { TicketIcon } from "./icon/ticket";
 
 type NavItemProps = {
   path: string
@@ -17,6 +18,12 @@ const tabs: Array<NavItemProps> = [
     label: "Trang chủ",
     icon: <Icon icon="zi-home" />,
     // activeIcon: <Icon icon="zi-home" />
+  },
+  {
+    path: "/voucher",
+    label: "Khuyến mãi",
+    icon: <TicketIcon sizeClass="w-6 h-6" />,
+    // activeIcon: <Icon icon="zi-notif" />,
   },
   {
     path: "/notification",

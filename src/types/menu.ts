@@ -5,3 +5,11 @@ export interface MenuItem {
   icon: ReactNode;
   activeIcon?: ReactNode;
 }
+
+export interface Voucher {
+  id: string;
+  code: string;
+  description: string;
+  value: string;
+  quantity: string
+}

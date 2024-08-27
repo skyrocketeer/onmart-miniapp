@@ -11,6 +11,7 @@ import { RecoilRoot } from "recoil";
 import { getConfig } from "utils/config";
 import { App, SnackbarProvider, ZMPRouter } from "zmp-ui";
 import { ConfigProvider } from "./config-provider";
+import VoucherPage from "pages/voucher";
 
 const MyApp = () => {
   return (
@@ -28,6 +29,7 @@ const MyApp = () => {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/category" element={<CategoryPage />} />
+                <Route path="/voucher" element={<VoucherPage />} />
                 <Route path="/notification" element={<NotificationPage />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/profile" element={<ProfilePage />} />

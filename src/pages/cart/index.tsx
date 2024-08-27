@@ -2,7 +2,7 @@ import PaymentCard, { PAYMENT_OPTION } from "components/card/payment-method";
 import { Divider } from "components/divider";
 import { SecondaryLayout } from "components/layout/layout-secondary";
 import { useCreateOrder, useVirtualKeyboardVisible } from "hooks";
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import cx from "utils/helpers";
 import { Box, Header, Icon, Text, useNavigate } from "zmp-ui";
 import { CartItems } from "./cart-items";
@@ -10,7 +10,7 @@ import { Delivery } from "./delivery";
 import { CartPreview } from "./preview";
 import { TermsAndPolicies } from "./term-and-policies";
 import { OrderData, ShippingData } from "types/order";
-import { cartState, shippingInfoState, totalPriceState, totalQuantityState } from "state";
+import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherState } from "state";
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { v4 as uuidv4 } from 'uuid';
@@ -28,6 +28,7 @@ const CartPage = () => {
   const totalPrice = useRecoilValue(totalPriceState);
   const cart = useRecoilValue(cartState);
   const shippingInfo = useRecoilValue(shippingInfoState)
+  const selectedVoucher = useRecoilValue(voucherState)
   const resetShipDataState = useResetRecoilState(shippingInfoState)
   const resetOrderDataState = useResetRecoilState(cartState)
 
@@ -71,6 +72,7 @@ const CartPage = () => {
         id: "COD",
         isCustom: false,
       },
+      selectedVoucher,
       quantity,
       item: listOrderItem
     } as OrderData

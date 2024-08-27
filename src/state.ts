@@ -4,6 +4,7 @@ import subscriptionIcon from "static/subscription-decor.svg";
 import { Cart } from "types/cart";
 import { Category } from "types/category";
 import { Store } from "types/delivery";
+import { Voucher } from "types/menu";
 import { Notification } from "types/notification";
 import { ShippingData } from "types/order";
 import { Product } from "types/product";
@@ -112,6 +113,11 @@ export const totalQuantityState = selector({
     return cart.reduce((total, item) => total + item.quantity, 0);
   },
 });
+
+export const voucherState = atom<string>({
+  key: "voucherState",
+  default: ''
+})
 
 export const totalPriceState = selector({
   key: "totalPrice",
@@ -347,4 +353,20 @@ export const defaultShippingState = {
 export const shippingInfoState = atom<ShippingData>({
   key: "shippingInfo",
   default: defaultShippingState,
+})
+
+export const voucherData = selector<Voucher[]>({
+  key: 'voucher',
+  get: async () => {
+    const vouchers = await fetch(`${API_URL}/sheet?vouchers`)
+      .then(res => {
+        return res.json();
+      })
+      .catch((error) => {
+        console.error(error);
+        return [] as Voucher[]
+      })
+
+    return vouchers as Voucher[]
+  },
 })

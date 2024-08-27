@@ -1,6 +1,7 @@
 import { SelectedOptions } from "types/cart";
 import { Option, Product } from "types/product";
 import { convertStringToNumber } from "./helpers";
+import { isEmpty } from "lodash";
 
 export function calcFinalPrice(product: Product, options?: SelectedOptions) {
   const priceBefore = convertStringToNumber(product.priceBefore);
@@ -95,4 +96,22 @@ export function splitByComma(price: any) {
 
   // Format the result
   return `${wholeNumber.toLocaleString()}`;
+}
+
+/**
+ * Convert a comma-separated price string to a number.
+ * @param {string} priceStr - The price string with commas (e.g., "10,000").
+ * @return {number} - The numeric value of the price.
+ */
+export function convertPriceToNumber(priceStr: string) {
+  if(isEmpty(priceStr)) return 0
+
+  // Remove commas from the price string
+  const cleanedString = priceStr.replace(/,/g, '');
+
+  // Convert the cleaned string to a number
+  const numberPrice = parseFloat(cleanedString);
+
+  // Return the number price
+  return numberPrice;
 }
