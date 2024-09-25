@@ -36,6 +36,7 @@ export const userState = selector({
 export const categoriesState = selector<Category[]>({
   key: "categories",
   get: async () => {
+    console.log('env is ', import.meta.env.MODE)
     const categoryData = await fetch(`${API_URL}/sheet?categories`)
       .then(response => response.json())
       .catch(error => {
