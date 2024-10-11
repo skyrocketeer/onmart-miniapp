@@ -36,7 +36,6 @@ export const userState = selector({
 export const categoriesState = selector<Category[]>({
   key: "categories",
   get: async () => {
-    console.log('env is ', import.meta.env.MODE)
     const categoryData = await fetch(`${API_URL}/sheet?categories`)
       .then(response => response.json())
       .catch(error => {
@@ -115,9 +114,15 @@ export const totalQuantityState = selector({
   },
 });
 
-export const voucherState = atom<string>({
+export const voucherState = atom<{
+  code: string,
+  value: string
+}>({
   key: "voucherState",
-  default: ''
+  default: {
+    code: '',
+    value: ''
+  }
 })
 
 export const totalPriceState = selector({

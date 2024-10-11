@@ -71,4 +71,3 @@ export function isDigit(value: string): boolean {
   const regex = /^\d+$/;
   return regex.test(value);
 }
-      

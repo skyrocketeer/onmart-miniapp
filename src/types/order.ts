@@ -7,7 +7,6 @@ export interface OrderData {
   description?: string,
   extraData: object,
   item: Record<string, any>[],
-  selectedVoucher: string
 }
 
 type ShippingDataKey = keyof typeof defaultShippingState;

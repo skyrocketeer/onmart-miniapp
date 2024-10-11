@@ -1,12 +1,11 @@
 import { ListItem } from "components/list-item";
-import React, { ChangeEvent, FC, MouseEventHandler, useEffect, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { createPortal } from "react-dom";
 import { Control, Controller, FieldErrors } from "react-hook-form";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { requestPhoneTriesState, shippingInfoState } from "state";
 import { ShippingData } from "types/order";
 import { getErrorMessage, phoneNumberRegex, unicodeAlphabetRegex } from "utils/form-validation";
-import cx from "utils/helpers";
 import { Box, Input, Sheet, Text } from "zmp-ui";
 
 type DeliveryInfo = {
@@ -42,11 +41,13 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    const newVal = value.slice(0, 10)
     // Update the specific field in the formData object
     setFormData(prevState => ({
       ...prevState,
-      [name]: value,
+      [name]: newVal
     }));
+    return newVal
   };
 
   const onChoosingLocation = (e) => {
@@ -107,16 +108,16 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                   required: 'Không được để trống số điện thoại người nhận',
                   pattern: {
                     value: phoneNumberRegex,
-                    message: 'Xin nhập đúng số điện thoại (10 số)'
+                    message: 'Xin nhập chính xác số điện thoại'
                   }
                 }}
                 render={({ field: { value, onChange } }) => (
                   <Input
                     name="phoneNumber"
-                    value={value as string}
+                    value={(value as string).slice(0, 10)}
                     onChange={(event) => {
-                      onChange(event);
-                      handleInputChange(event)
+                      const truncatedValue = handleInputChange(event);
+                      onChange(truncatedValue);
                     }}
                     placeholder="Nhập số điện thoại người nhận"
                   />

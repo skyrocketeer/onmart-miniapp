@@ -1,29 +1,36 @@
 import { DisplayPrice } from "components/display/price";
-import React, { startTransition, useEffect } from "react";
+import { Divider } from "components/divider";
+import { isEmpty, truncate } from "lodash";
+import React, { ChangeEvent, startTransition, useEffect, useMemo, useState } from "react";
 import { useRecoilState, useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
-import { shippingInfoState, totalPriceState, totalQuantityState, voucherData, voucherState } from "state";
-import { convertPriceToNumber, splitByComma } from "utils/price";
-import { Box, Button, Text } from "zmp-ui";
+import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherData, voucherState } from "state";
+import { VoucherData } from "types/voucher";
+import { API_URL } from "utils/constant";
+import { convertDiscountPriceToNumber, splitByComma } from "utils/price";
+import { Box, Button, Input, Text } from "zmp-ui";
 
 export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const quantity = useRecoilValue(totalQuantityState);
   const totalPrice = useRecoilValue(totalPriceState);
-  const selectedVoucher = useRecoilValue(voucherState)
+  const [selectedVoucher, setVoucher] = useRecoilState(voucherState)
   const { contents: voucherList } = useRecoilValueLoadable(voucherData);
+  const [isErr, setIsErr] = useState(false)
   const SHIP_FEE = Number(process.env.SHIP_FEE) || 20000
   const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 150000
   const actualShipFee = totalPrice > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
   const setShippingInfo = useSetRecoilState(shippingInfoState)
 
-  const getVoucherValue = () => {
-    if (Array.isArray(voucherList)) {
-      const voucher = voucherList.find(item => item.id === selectedVoucher);
-      return voucher
-        ? { name: voucher.code, value: voucher.value }
-        : { name: '', value: '0' };
-    }
-    return { name: '', value: '0' };
-  };
+  const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    if (!isEmpty(value)) setIsErr(false)
+    setVoucher({ ...selectedVoucher, code: value, value: '0' });
+  }
+
+  const calcPromoCodeValue = () => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value)
+
+  const calculateFinalPrice = (originPrice: number) => calcPromoCodeValue() < 1 ? originPrice * calcPromoCodeValue() : originPrice - calcPromoCodeValue()
+
+  const promoCodeValue = useMemo(() => calculateFinalPrice(totalPrice), [selectedVoucher, totalPrice]);
 
   useEffect(() => {
     startTransition(() => {
@@ -33,6 +40,27 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
       }));
     });
   }, [actualShipFee])
+
+  const verifyVoucher = (_): void => {
+    fetch(`${API_URL}/promo?ref_code=${selectedVoucher.code}`)
+      .then(async (response) => {
+        if (response.ok) {
+          const result = await response.json() as VoucherData
+          setVoucher((prevVoucher) => ({
+            ...prevVoucher, // Spread previous state
+            code: result.code, // Make sure code is set
+            value: result.rate // Update value with the fetched rate
+          }));
+        } else {
+          console.error('Error fetching data:', response.statusText);
+          setIsErr(true)
+        }
+      })
+      .catch(err => {
+        console.log(err)
+        setIsErr(true)
+      })
+  }
 
   return (
     <Box className="sticky bottom-0 bg-background p-4">
@@ -45,8 +73,50 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           <Text size="xSmall">
             {quantity} sản phẩm
           </Text>
-          <Text size="small">
+          <Text size="small" className="text-primary">
             <DisplayPrice useCurrency>{totalPrice}</DisplayPrice>
+          </Text>
+        </Box>
+        <Box flex justifyContent="space-between" className="!mt-4 space-x-4">
+          <Input placeholder="Nhập mã giảm giá"
+            className="text-sm w-44 h-10"
+            size="small"
+            name="code"
+            value={selectedVoucher.code}
+            onChange={(event) => {
+              // onChange(event);
+              handleInputChange(event)
+            }}
+          />
+          <Button size="small"
+            className="w-44 h-10 rounded-md"
+            disabled={quantity <= 0 || isErr || isEmpty(selectedVoucher.value)}
+            onClick={verifyVoucher}
+          >
+            ÁP DỤNG
+          </Button>
+        </Box>
+        {isErr && <Box className="!mt-[5px]">
+          <Text size="xxSmall" className="text-red-500">Mã khuyến mãi đã hết hạn hoặc không hợp lệ</Text>
+        </Box>}
+        <Box
+          flex
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Text size="xSmall" className="text-slate-500">
+            Mã giảm giá: {truncate(selectedVoucher.code, {
+              length: 15, separator: '.'
+            })}
+          </Text>
+          {isErr &&
+            <Text size="xxSmall" className="!ml-[-15px] text-red-500">
+              (không thể áp dụng mã)
+            </Text>}
+          <Text size="small" className="text-orange-500">
+            <DisplayPrice useCurrency>
+              {promoCodeValue}
+            </DisplayPrice>
           </Text>
         </Box>
         <Box
@@ -57,24 +127,10 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           <Text size="xSmall">
             Phí giao hàng (miễn phí cho đơn hàng trên {splitByComma(FREESHIP_MIN_VALUE)}đ)
           </Text>
-          <Text size="small">
+          <Text size="small" className="text-primary">
             <DisplayPrice useCurrency>{actualShipFee}</DisplayPrice>
           </Text>
         </Box>
-        {selectedVoucher ?
-          (<Box
-            flex
-            justifyContent="space-between"
-            className="text-slate-500"
-          >
-            <Text size="xSmall">
-              Mã giảm giá: {getVoucherValue().name}
-            </Text>
-            <Text size="small">
-              {getVoucherValue().value}đ
-            </Text>
-          </Box>
-          ) : null}
         <Box
           flex
           justifyContent="space-between"
@@ -82,11 +138,9 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           <Text.Title size="normal">
             Tổng giá trị đơn hàng
           </Text.Title>
-          <Text size="xLarge">
+          <Text size="xLarge" className="text-blue-600 font-bold">
             <DisplayPrice useCurrency>
-              {totalPrice + actualShipFee -
-                (selectedVoucher ? convertPriceToNumber(getVoucherValue().value) : 0)
-              }
+              {totalPrice + actualShipFee - promoCodeValue}
             </DisplayPrice>
           </Text>
         </Box>

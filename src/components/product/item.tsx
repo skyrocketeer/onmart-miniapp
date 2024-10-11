@@ -1,8 +1,8 @@
 import { FinalPrice } from "components/display/final-price";
 import { DisplayPrice } from "components/display/price";
-import React, { FC, useCallback } from "react";
+import React, { FC } from "react";
 import { Product } from "types/product";
-import { Box, Icon, Input, Text } from "zmp-ui";
+import { Box, Icon, Text } from "zmp-ui";
 import { ProductPicker } from "./picker";
 import cx, { convertStringToNumber } from "utils/helpers";
 import { useRecoilValue } from "recoil";
@@ -77,7 +77,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
                   <FinalPrice>{product}</FinalPrice>
                 </Text>
                 <Text size="xSmall" className="text-orange-400">
-                  Đơn vị tính: 1kg
+                  Đơn vị tính: {product.unit}
                 </Text>
               </Box>
             </Box>

@@ -47,7 +47,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
   const [options, setOptions] = useState<SelectedOptions>(
     selected ? selected.options : getDefaultOptions(product),
   );
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const setCart = useSetRecoilState(cartState);
 
   useEffect(() => {
@@ -62,7 +62,6 @@ export const ProductPicker: FC<ProductPickerProps> = ({
       setCart((cart) => {
         let res = [...cart];
         if (selected) {
-          console.log('select', selected);
           // updating an existing cart item, including quantity and size, or remove it if new quantity is 0
           const editing = cart.find(
             (item) =>
@@ -179,7 +178,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                     variant={quantity > 0 ? "primary" : "secondary"}
                     type={quantity > 0 ? "highlight" : "neutral"}
                     fullWidth
-                    onClick={(e) => addToCart}
+                    onClick={(e) => handleAddToCartNow(quantity)}
                   >
                     {quantity > 0
                       ? selected
@@ -189,11 +188,11 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                   </Button>
                 ) : (
                   <Button
-                    disabled={!quantity}
-                    variant="primary"
-                    type="highlight"
-                    fullWidth
-                      onClick={(e) => addToCart}
+                      disabled={!quantity}
+                      variant="primary"
+                      type="highlight"
+                      fullWidth
+                      onClick={(e) => handleAddToCartNow(quantity)}
                   >
                     Thêm vào giỏ hàng
                   </Button>

@@ -39,6 +39,7 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
       updateShipInfo("shippingAddressText", value)
     }
   };
+
   return (
     <Box className="space-y-3 px-4">
       <Text.Header>Hình thức nhận hàng</Text.Header>

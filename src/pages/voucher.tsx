@@ -1,7 +1,7 @@
 import { Divider } from "components/divider";
 import { MainLayout } from "components/layout/layout-main";
 import React, { FC, Suspense } from "react";
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { voucherData, voucherState } from "state";
 import { Box, Header, Text } from "zmp-ui";
 import logo from "static/logo.png";
@@ -12,7 +12,7 @@ const VoucherList = () => {
   const voucherList = useRecoilValue(voucherData);
 
   const handleSelectVoucher = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, id: string): void => {
-    setSelected(selected === id ? '' : id);
+    setSelected({ ...selected, code: selected.code === id ? '' : id });
   }
 
   return (
@@ -30,7 +30,7 @@ const VoucherList = () => {
             </Text>
           </Box>
           <Box role="button" onClick={(e) => handleSelectVoucher(e, voucher.id)}>
-            <BookmarkIcon isActive={selected === voucher.id} />
+            <BookmarkIcon isActive={selected.code === voucher.id} />
           </Box>
         </Box>
       ))}

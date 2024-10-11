@@ -66,13 +66,13 @@ const CartPage = () => {
         storeName: 'onMart',
         orderGroupId: tid,
         myTransactionId: tid,
-        shippingFee: shippingInfo.shippingFee
+        shippingFee: shippingInfo.shippingFee,
+        ref_code: selectedVoucher.code,
       },
       method: {
         id: "COD",
         isCustom: false,
       },
-      selectedVoucher,
       quantity,
       item: listOrderItem
     } as OrderData

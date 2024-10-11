@@ -5,6 +5,8 @@ import { Box, Text } from "zmp-ui";
 
 export const CartIcon: FC<{ active?: boolean }> = ({ active }) => {
   const cart = useRecoilValue(cartState);
+  const getCartTotal = () => cart.reduce((total, item) => total + item.quantity, 0)
+
   return (
     <Box className="relative">
       <svg
@@ -25,7 +27,7 @@ export const CartIcon: FC<{ active?: boolean }> = ({ active }) => {
             className="w-4 h-4 bg-red-500 rounded-full text-white"
             size="xxxxSmall"
           >
-            {cart.length > 9 ? "9+" : cart.length}
+            {getCartTotal() > 9 ? "9+" : getCartTotal()}
           </Text>
         </Box>
       )}

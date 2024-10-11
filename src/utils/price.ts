@@ -115,3 +115,16 @@ export function convertPriceToNumber(priceStr: string) {
   // Return the number price
   return numberPrice;
 }
+
+export function convertDiscountPriceToNumber(discount: number | string) {
+  // let discountAmount: number;
+  if (typeof discount === 'string' && discount.endsWith('%')) {
+    // If the discount is a percentage
+    return parseFloat(discount.replace('%', ''))/100;
+    // discountAmount = (percentage / 100) * originalPrice;
+  } else {
+    // Assume the discount is an absolute amount
+    return Number(discount)
+    // discountAmount = Number(discount);
+  }
+}

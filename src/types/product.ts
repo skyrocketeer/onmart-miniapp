@@ -46,6 +46,7 @@ export interface Product {
   category: string;
   description?: string;
   priceSale: string;
+  unit: string;
   // priceSale?: Sale;
   variants?: Variant[];
   inStock: StockStatus;
