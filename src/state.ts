@@ -273,30 +273,30 @@ export const selectedStoreState = selector({
   },
 });
 
-export const requestLocationTriesState = atom({
-  key: "requestLocationTries",
-  default: 0,
-});
+// export const requestLocationTriesState = atom({
+//   key: "requestLocationTries",
+//   default: 0,
+// });
 
-export const requestPhoneTriesState = atom({
-  key: "requestPhoneTries",
-  default: 0,
-});
+// export const requestPhoneTriesState = atom({
+//   key: "requestPhoneTries",
+//   default: 0,
+// });
 
 export const locationState = selector<
   { latitude: string; longitude: string }
 >({
   key: "location",
   get: async ({ get }) => {
-    const requested = get(requestLocationTriesState);
-    if (requested) {
+    // const requested = get(requestLocationTriesState);
+    // if (requested) {
       const { latitude, longitude, token } = await getLocation({
         fail: console.warn,
       });
       if (latitude && longitude) {
         return { latitude, longitude };
       }
-      if (token) {
+      // if (token) {
         console.warn(
           "Sử dụng token này để truy xuất vị trí chính xác của người dùng",
           token
@@ -310,37 +310,18 @@ export const locationState = selector<
           latitude: "10.7287",
           longitude: "106.7317",
         };
-      }
+      // }
     }
-    return {
-      latitude: "10.7287",
-      longitude: "106.7317",
-    };
-  },
+    // return {
+    //   latitude: "10.7287",
+    //   longitude: "106.7317",
+    // };
+  // },
 });
 
-export const phoneState = selector<string>({
+export const phoneState = atom<string>({
   key: "phone",
-  get: async ({ get }) => {
-    const requested = get(requestPhoneTriesState);
-    if (requested) {
-      const { number, token } = await getPhoneNumber({ fail: console.warn });
-      if (number) {
-        return number;
-      }
-      console.warn(
-        "Sử dụng token này để truy xuất số điện thoại của người dùng",
-        token
-      );
-      console.warn(
-        "Chi tiết tham khảo: ",
-        "https://mini.zalo.me/blog/thong-bao-thay-doi-luong-truy-xuat-thong-tin-nguoi-dung-tren-zalo-mini-app"
-      );
-      console.warn("Giả lập số điện thoại mặc định:");
-      return "";
-    }
-    return "";
-  },
+  default: ""  
 });
 
 export const defaultShippingState = {

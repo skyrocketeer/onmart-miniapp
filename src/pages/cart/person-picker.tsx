@@ -2,11 +2,13 @@ import { ListItem } from "components/list-item";
 import React, { ChangeEvent, useState } from "react";
 import { createPortal } from "react-dom";
 import { Control, Controller, FieldErrors } from "react-hook-form";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { requestPhoneTriesState, shippingInfoState } from "state";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { phoneState, shippingInfoState } from "state";
 import { ShippingData } from "types/order";
 import { getErrorMessage, phoneNumberRegex, unicodeAlphabetRegex } from "utils/form-validation";
-import { Box, Input, Sheet, Text } from "zmp-ui";
+import { Box, Input, Modal, Sheet, Text } from "zmp-ui";
+import { getAccessToken, openPermissionSetting, authorize, getPhoneNumber } from "zmp-sdk/apis";
+import { API_URL } from "utils/constant";
 
 type DeliveryInfo = {
   clientName: string,
@@ -36,8 +38,47 @@ export const PersonPicker = ({ control, errors }:
 export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue = defaultValue, control, errors }:
   { emitChangeDeliveryInfo?: Function, initialValue?: DeliveryInfo, control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
   const [visible, setVisible] = useState(false)
+  const [popupVisible, setPopupVisible] = useState(false);
   const [formData, setFormData] = useState(initialValue);
-  const retry = useSetRecoilState(requestPhoneTriesState);
+  const [phone, setPhoneState] = useRecoilState(phoneState);
+
+  const getUserInfo = async () => {
+    try {
+      await authorize({ scopes: ["scope.userLocation", "scope.userPhonenumber"] });
+      await openPermissionSetting({})
+      const accessToken = await getAccessToken({});
+      console.log('accessToken ', accessToken)
+      getUserPrivateInfo(accessToken)
+        .then(number => setPhoneState(number))
+        .catch
+    } catch (error) {
+      // xử lý khi gọi api thất bại
+      console.log("cannot ask for user permission", error);
+      setVisible(false)
+      setPopupVisible(true)
+    }
+  }
+
+  const getUserPrivateInfo = async (token: string) => {
+    const { number } = await getPhoneNumber({ fail: console.warn });
+    if (number) {
+      return number;
+    }
+    fetch(`${API_URL}/`, {
+      method: 'POST',
+      body: token
+    })
+      .then(async (response) => {
+        const data = await response.json()
+        console.log(data)
+        return data
+      })
+      .catch(err => {
+        console.error(err)
+        return ""
+      })
+    return ""
+  }
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -62,6 +103,26 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
         onClick={() => setVisible(true)}
         title={formData.phoneNumber ? `${formData.clientName || "Người nhận"} - ${formData.phoneNumber}` : "Chọn người nhận"}
         subtitle="Yêu cầu truy cập số điện thoại nếu tự điền thông tin"
+      />
+      <Modal
+        visible={popupVisible}
+        title="Lỗi lấy thông tin cá nhân"
+        onClose={() => {
+          setPopupVisible(false);
+        }}
+        actions={[
+          {
+            text: "Đóng",
+            close: true,
+          },
+          {
+            text: "Cấp quyền",
+            onClick: getUserInfo,
+            highLight: true,
+          },
+        ]}
+        modalClassName="text-red-500"
+        description="Bạn cần cấp quyền cho ứng dụng để lấy được thông tin vị trí và số điện thoại"
       />
       {(errors.clientName || errors.phoneNumber) &&
         <div className="text-xs text-red-600 mt-1">Thông tin người nhận chưa chính xác</div>
@@ -98,7 +159,11 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                   />
                 )}
               />
-              {errors.clientName && <div className="text-xs text-red-600">{getErrorMessage(errors.clientName)}</div>}
+              {errors.clientName &&
+                <div className="text-xs text-red-600">
+                  {getErrorMessage(errors.clientName)}
+                </div>
+              }
             </Box>
             <Box>
               <Controller
@@ -114,7 +179,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                 render={({ field: { value, onChange } }) => (
                   <Input
                     name="phoneNumber"
-                    value={(value as string).slice(0, 10)}
+                    value={phone}
                     onChange={(event) => {
                       const truncatedValue = handleInputChange(event);
                       onChange(truncatedValue);
@@ -127,7 +192,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
             </Box>
             <Box flex className="space-x-5 pt-6">
               <button className="rounded-xl text-white bg-primary py-2 px-2 font-semibold"
-                onClick={() => retry((r) => r + 1)}
+                onClick={getUserInfo}
               >
                 Điền thông tin của tôi
               </button>

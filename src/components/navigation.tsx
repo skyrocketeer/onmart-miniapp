@@ -25,24 +25,24 @@ const tabs: Array<NavItemProps> = [
     icon: <TicketIcon sizeClass="w-6 h-6" />,
     // activeIcon: <Icon icon="zi-notif" />,
   },
-  {
-    path: "/notification",
-    label: "Thông báo",
-    icon: <Icon icon="zi-notif" />,
-    // activeIcon: <Icon icon="zi-notif" />,
-  },
+  // {
+  //   path: "/notification",
+  //   label: "Thông báo",
+  //   icon: <Icon icon="zi-notif" />,
+  //   // activeIcon: <Icon icon="zi-notif" />,
+  // },
   {
     path: "/cart",
     label: "Giỏ hàng",
     icon: <CartIcon />,
     activeIcon: <CartIcon active />,
   },
-  {
-    path: "/profile",
-    label: "Cá nhân",
-    icon: <Icon icon="zi-user" />,
-    // activeIcon: <Icon icon="zi-user-solid" />,
-  },
+  // {
+  //   path: "/profile",
+  //   label: "Cá nhân",
+  //   icon: <Icon icon="zi-user" />,
+  //   // activeIcon: <Icon icon="zi-user-solid" />,
+  // },
 ];
 
 export const NO_BOTTOM_NAVIGATION_PAGES = ["/search", "/category", "/result"];

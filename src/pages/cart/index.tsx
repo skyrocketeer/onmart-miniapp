@@ -14,7 +14,6 @@ import { cartState, shippingInfoState, totalPriceState, totalQuantityState, vouc
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { v4 as uuidv4 } from 'uuid';
-import { fromMilisToDate } from "utils/date";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -85,21 +84,22 @@ const CartPage = () => {
         type: PAYMENT_OPTION["COD"],
         text: "Thanh toán khi nhận hàng (COD)",
         isOn: true
-      }, {
-        type: PAYMENT_OPTION["CREDIT_CARD"],
-        text: "Thẻ tín dụng",
-        isOn: true
-      },
-      {
-        type: PAYMENT_OPTION["ZALOPAY"],
-        text: "Ví Zalopay",
-        isOn: true
-      },
-      {
-        type: PAYMENT_OPTION["MOMO"],
-        text: "Ví Momo",
-        isOn: false
-      },
+      }, 
+      // {
+      //   type: PAYMENT_OPTION["CREDIT_CARD"],
+      //   text: "Thẻ tín dụng",
+      //   isOn: true
+      // },
+      // {
+      //   type: PAYMENT_OPTION["ZALOPAY"],
+      //   text: "Ví Zalopay",
+      //   isOn: true
+      // },
+      // {
+      //   type: PAYMENT_OPTION["MOMO"],
+      //   text: "Ví Momo",
+      //   isOn: false
+      // },
     ]
 
     const handleChangeMethod = ({ type, isOn }: PaymentMethodProps) => {
