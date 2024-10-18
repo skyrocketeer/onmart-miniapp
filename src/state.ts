@@ -283,56 +283,26 @@ export const selectedStoreState = selector({
 //   default: 0,
 // });
 
-export const locationState = selector<
-  { latitude: string; longitude: string }
->({
+export const locationState = selector<{ latitude: string; longitude: string }>({
   key: "location",
-  get: async ({ get }) => {
-    // const requested = get(requestLocationTriesState);
-    // if (requested) {
-      const { latitude, longitude, token } = await getLocation({
-        fail: console.warn,
-      });
-      if (latitude && longitude) {
-        return { latitude, longitude };
-      }
-      // if (token) {
-        console.warn(
-          "Sử dụng token này để truy xuất vị trí chính xác của người dùng",
-          token
-        );
-        console.warn(
-          "Chi tiết tham khảo: ",
-          "https://mini.zalo.me/blog/thong-bao-thay-doi-luong-truy-xuat-thong-tin-nguoi-dung-tren-zalo-mini-app"
-        );
-        console.warn("Giả lập vị trí mặc định: VNG Campus");
-        return {
-          latitude: "10.7287",
-          longitude: "106.7317",
-        };
-      // }
-    }
-    // return {
-    //   latitude: "10.7287",
-    //   longitude: "106.7317",
-    // };
-  // },
+  get: async () => {
+    return {
+      latitude: "10.7287",
+      longitude: "106.7317",
+    };
+  }
 });
 
 export const phoneState = atom<string>({
   key: "phone",
-  default: ""  
+  default: ""
 });
 
 export const defaultShippingState = {
   clientName: "",
   phoneNumber: "",
   shippingTime: new Date().getTime(),
-  shippingAddressCoord: {
-    latitude: 0,
-    longitude: 0,
-  },
-  shippingAddressText: "",
+  shippingAddress: "",
   note: "",
   shippingFee: 20000
 }

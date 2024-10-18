@@ -37,14 +37,14 @@ const CartPage = () => {
       clientName: shippingInfo.clientName,
       phoneNumber: shippingInfo.phoneNumber,
       shippingTime: shippingInfo.shippingTime,
-      shippingAddressText: shippingInfo.shippingAddressText,
+      shippingAddress: shippingInfo.shippingAddress,
       note: shippingInfo.note
     },
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true
   });
-  const { handleSubmit, control, formState: { errors, isSubmitting } } = methods
+  const { handleSubmit, control, setValue, getValues, formState: { errors, isSubmitting } } = methods
 
   const keyboardVisible = useVirtualKeyboardVisible();
 
@@ -153,6 +153,8 @@ const CartPage = () => {
         <Delivery
           control={control}
           errors={errors}
+          getValues={getValues}
+          setValue={setValue}
         />
         <Divider size={12} />
         <PaymentOptions />

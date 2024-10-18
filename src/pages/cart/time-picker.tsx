@@ -1,7 +1,7 @@
-import React, { FC, useEffect, useMemo, useState } from "react";
+import React, { FC, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
-import { displayDate, displayHalfAnHourTimeRange, fromMilisToDate } from "utils/date";
+import { displayHalfAnHourTimeRange } from "utils/date";
 import { matchStatusBarColor } from "utils/device";
 import { Picker } from "zmp-ui";
 

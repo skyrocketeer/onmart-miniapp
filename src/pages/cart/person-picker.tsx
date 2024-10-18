@@ -1,29 +1,31 @@
 import { ListItem } from "components/list-item";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Control, Controller, FieldErrors } from "react-hook-form";
+import { Control, Controller, FieldErrors, useForm, UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { phoneState, shippingInfoState } from "state";
+import { shippingInfoState, userState } from "state";
 import { ShippingData } from "types/order";
 import { getErrorMessage, phoneNumberRegex, unicodeAlphabetRegex } from "utils/form-validation";
 import { Box, Input, Modal, Sheet, Text } from "zmp-ui";
-import { getAccessToken, openPermissionSetting, authorize, getPhoneNumber } from "zmp-sdk/apis";
+import { getAccessToken, openPermissionSetting, authorize, getPhoneNumber, getLocation } from "zmp-sdk/apis";
 import { API_URL } from "utils/constant";
+import { isEmpty, truncate } from "lodash";
 
 type DeliveryInfo = {
   clientName: string,
   phoneNumber: string
 }
 
-const defaultValue = {
-  clientName: '',
-  phoneNumber: '',
-}
 
-export const PersonPicker = ({ control, errors }:
-  { control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
+export const PersonPicker = ({ control, errors, setValue, getHookFormValues }: {
+  control: Control<ShippingData, any>,
+  errors: FieldErrors<ShippingData>,
+  setValue: UseFormSetValue<ShippingData>,
+  getHookFormValues: UseFormGetValues<ShippingData>
+}) => {
   const [globalState, updateState] = useRecoilState(shippingInfoState);
   const handleChangeDeliveryInfo = (newData: DeliveryInfo) => {
+    console.log("newData ", newData)
     updateState({ ...globalState, ...newData })
   }
 
@@ -32,76 +34,125 @@ export const PersonPicker = ({ control, errors }:
     initialValue={{ clientName: globalState.clientName as string, phoneNumber: globalState.phoneNumber as string }}
     control={control}
     errors={errors}
+    setHookFormValue={setValue}
+    getHookFormValues={getHookFormValues}
   />
 };
 
-export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue = defaultValue, control, errors }:
-  { emitChangeDeliveryInfo?: Function, initialValue?: DeliveryInfo, control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
+export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue, control, errors, setHookFormValue, getHookFormValues }: {
+  emitChangeDeliveryInfo?: Function,
+  initialValue: DeliveryInfo,
+  control: Control<ShippingData, any>,
+  errors: FieldErrors<ShippingData>,
+  setHookFormValue: UseFormSetValue<ShippingData>,
+  getHookFormValues: UseFormGetValues<ShippingData>
+}) => {
   const [visible, setVisible] = useState(false)
   const [popupVisible, setPopupVisible] = useState(false);
-  const [formData, setFormData] = useState(initialValue);
-  const [phone, setPhoneState] = useRecoilState(phoneState);
+  const currentZaloUser = useRecoilValue(userState)
 
   const getUserInfo = async () => {
     try {
       await authorize({ scopes: ["scope.userLocation", "scope.userPhonenumber"] });
-      await openPermissionSetting({})
       const accessToken = await getAccessToken({});
-      console.log('accessToken ', accessToken)
-      getUserPrivateInfo(accessToken)
-        .then(number => setPhoneState(number))
-        .catch
+      // console.log('accessToken', accessToken);
+      const phone_token = await getPhoneNumber({}).then(result => result.token || "")
+      // console.log(phone_token)
+      const location_token = await getLocation({}).then(result => result.token || "")
+      // console.log(location_token)
+      requestUserPrivateInfo(accessToken, phone_token, location_token)
+
+      // requestUserPrivateInfo("accessToken", "phone_token", "location_token")
     } catch (error) {
       // xử lý khi gọi api thất bại
-      console.log("cannot ask for user permission", error);
-      setVisible(false)
-      setPopupVisible(true)
+      console.log("cannot ask for user permission ", error);
     }
   }
 
-  const getUserPrivateInfo = async (token: string) => {
-    const { number } = await getPhoneNumber({ fail: console.warn });
-    if (number) {
-      return number;
+  function formatPhoneNumber(phoneNumber) {
+    const phoneStr = String(phoneNumber);
+
+    // Check if it starts with '84'
+    if (phoneStr.startsWith('84')) {
+      // Replace '84' with '0'
+      return '0' + phoneStr.slice(2);
     }
-    fetch(`${API_URL}/`, {
-      method: 'POST',
-      body: token
-    })
+
+    return phoneStr; // Return the original string if it doesn't start with '84'
+  }
+
+  const requestUserPrivateInfo = async (
+    accessToken: string,
+    phone_token: string,
+    location_token: string
+  ) => {
+    const data = {
+      accessToken,
+      phone_token,
+      location_token
+    };
+
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data),
+    };
+
+    fetch(`${API_URL}/user/info`, requestOptions)
       .then(async (response) => {
         const data = await response.json()
-        console.log(data)
-        return data
+        if (!data.phone_number.length || isEmpty(data.location)) {
+          setVisible(false)
+          setPopupVisible(true)
+        }
+
+        if (data.phone_number!!) {
+          const phoneNumber = formatPhoneNumber(data.phone_number)
+          setHookFormValue('clientName', currentZaloUser.name);
+          setHookFormValue('phoneNumber', phoneNumber);
+        }
+
+        if (!isEmpty(data.location) && data.location.latitude!! && data.location.longitude!!) {
+          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${data.location.latitude}&lon=${data.location.longitude}&format=json&accept-language=vi`)
+            .then(res => res.json())
+            .then(res => {
+              emitChangeDeliveryInfo?.({ shippingAddress: res.display_name!! })
+            })
+        }
+        if (popupVisible)
+          setPopupVisible(false)
       })
       .catch(err => {
-        console.error(err)
-        return ""
+        console.error(err.message)
+        setVisible(false)
+        setPopupVisible(true)
       })
-    return ""
   }
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    const newVal = value.slice(0, 10)
-    // Update the specific field in the formData object
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: newVal
-    }));
-    return newVal
+    let { name, value } = event.target;
+    if (name === 'phoneNumber') {
+      value = truncate(value, { length: 10 });
+    }
+    return value
   };
 
   const onChoosingLocation = (e) => {
     setVisible(false)
     if (emitChangeDeliveryInfo)
-      emitChangeDeliveryInfo(formData)
+      emitChangeDeliveryInfo({
+        phoneNumber: getHookFormValues("phoneNumber"),
+        clientName: getHookFormValues("clientName")
+      })
   }
 
   return (
     <>
       <ListItem
         onClick={() => setVisible(true)}
-        title={formData.phoneNumber ? `${formData.clientName || "Người nhận"} - ${formData.phoneNumber}` : "Chọn người nhận"}
+        title={getHookFormValues("clientName") ? `${getHookFormValues("clientName") || initialValue.clientName || "Người nhận"} - ${getHookFormValues("phoneNumber") || initialValue.phoneNumber}` : "Chọn người nhận"}
         subtitle="Yêu cầu truy cập số điện thoại nếu tự điền thông tin"
       />
       <Modal
@@ -116,13 +167,13 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
             close: true,
           },
           {
-            text: "Cấp quyền",
+            text: "Cấp lại quyền",
             onClick: getUserInfo,
             highLight: true,
           },
         ]}
-        modalClassName="text-red-500"
-        description="Bạn cần cấp quyền cho ứng dụng để lấy được thông tin vị trí và số điện thoại"
+        modalClassName="text-red-500 text-center"
+        description="Có lỗi xảy ra hoặc bạn cần cấp quyền cho ứng dụng để lấy được thông tin vị trí và số điện thoại"
       />
       {(errors.clientName || errors.phoneNumber) &&
         <div className="text-xs text-red-600 mt-1">Thông tin người nhận chưa chính xác</div>
@@ -150,10 +201,9 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                 render={({ field: { value, onChange } }) => (
                   <Input
                     name="clientName"
-                    value={value as string}
+                    value={value}
                     onChange={(event) => {
-                      onChange(event);
-                      handleInputChange(event)
+                      onChange(handleInputChange(event));
                     }}
                     placeholder="Nhập tên người nhận"
                   />
@@ -179,10 +229,9 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue 
                 render={({ field: { value, onChange } }) => (
                   <Input
                     name="phoneNumber"
-                    value={phone}
+                    value={value}
                     onChange={(event) => {
-                      const truncatedValue = handleInputChange(event);
-                      onChange(truncatedValue);
+                      onChange(handleInputChange(event));
                     }}
                     placeholder="Nhập số điện thoại người nhận"
                   />

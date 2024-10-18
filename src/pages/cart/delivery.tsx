@@ -7,7 +7,7 @@ import { TimePicker } from "./time-picker";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
 import { getErrorMessage } from "utils/form-validation";
-import { Control, Controller, FieldErrors } from "react-hook-form";
+import { Control, Controller, FieldErrors, UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import { ShippingData } from "types/order";
 
 enum ShipType {
@@ -15,7 +15,12 @@ enum ShipType {
   AT_STORE = "PICKUP",
 }
 
-export const Delivery = ({ control, errors }: { control: Control<ShippingData, any>, errors: FieldErrors<ShippingData> }) => {
+export const Delivery = ({ control, errors, setValue, getValues }: {
+  control: Control<ShippingData, any>,
+  getValues: UseFormGetValues<ShippingData>,
+  errors: FieldErrors<ShippingData>,
+  setValue: UseFormSetValue<ShippingData>
+}) => {
   const [shipInfo, setShipInfo] = useRecoilState(shippingInfoState);
   const [shipType, setShipType] = useState(ShipType.AT_DOOR)
 
@@ -30,13 +35,17 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
     }
   }
 
+  useEffect(() => {
+    setValue("shippingAddress", shipInfo.shippingAddress)
+  }, [shipInfo.shippingAddress])
+
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     if (name == "note") {
       updateShipInfo("note", value)
     }
     else {
-      updateShipInfo("shippingAddressText", value)
+      updateShipInfo("shippingAddress", value)
     }
   };
 
@@ -73,7 +82,7 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
                   <Box flex alignItems="center" className="space-x-4">
                     <Icon className="text-white" icon="zi-radio-checked" size={18} />
                     <Controller
-                      name='shippingAddressText'
+                      name='shippingAddress'
                       control={control}
                       rules={{
                         required: 'Không được để trống địa chỉ',
@@ -92,7 +101,7 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
                       )}
                     />
                   </Box>
-                  {errors.shippingAddressText && <div className="text-xs text-orange-400 ml-9 mt-[-8px]">{getErrorMessage(errors.shippingAddressText)}</div>}
+                  {errors.shippingAddress && <div className="text-xs text-orange-400 ml-9 mt-[-8px]">{getErrorMessage(errors.shippingAddress)}</div>}
                 </Box>
               </Box>
             ),
@@ -115,7 +124,12 @@ export const Delivery = ({ control, errors }: { control: Control<ShippingData, a
             left: <Icon icon="zi-user" className="my-auto" />,
             right: (
               <Suspense>
-                <PersonPicker control={control} errors={errors} />
+                <PersonPicker
+                  control={control}
+                  errors={errors}
+                  setValue={setValue}
+                  getHookFormValues={getValues}
+                />
               </Suspense>
             ),
           },
