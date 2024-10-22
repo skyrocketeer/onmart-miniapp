@@ -46,10 +46,6 @@ export function calcFinalPrice(product: Product, options?: SelectedOptions) {
   return finalPrice > 0 ? finalPrice : priceBefore;
 }
 
-export function getDummyImage(filename: string) {
-  return `https://stc-zmp.zadn.vn/templates/zaui-coffee/dummy/${filename}`;
-}
-
 export function isIdentical(
   option1: SelectedOptions,
   option2: SelectedOptions,

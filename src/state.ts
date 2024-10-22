@@ -36,7 +36,7 @@ export const userState = selector({
 export const categoriesState = selector<Category[]>({
   key: "categories",
   get: async () => {
-    const categoryData = await fetch(`${API_URL}/sheet?categories`)
+    const categoryData = await fetch(`${API_URL}/sheet/categories`)
       .then(response => response.json())
       .catch(error => {
         console.error(error);
@@ -51,7 +51,7 @@ export const productsState = selector<Product[]>({
   get: async () => {  
     // await wait(2000);
     // const products = (await import("../mock/products.json")).default;
-    const products = await fetch(`${API_URL}/sheet?products`)
+    const products = await fetch(`${API_URL}/sheet/products`)
       .then((res) => {
         return res.json()
       })
@@ -315,7 +315,7 @@ export const shippingInfoState = atom<ShippingData>({
 export const voucherData = selector<Voucher[]>({
   key: 'voucher',
   get: async () => {
-    const vouchers = await fetch(`${API_URL}/sheet?vouchers`)
+    const vouchers = await fetch(`${API_URL}/sheet/vouchers`)
       .then(res => {
         return res.json();
       })

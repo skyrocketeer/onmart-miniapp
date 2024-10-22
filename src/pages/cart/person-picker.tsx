@@ -103,7 +103,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
     fetch(`${API_URL}/user/info`, requestOptions)
       .then(async (response) => {
         const data = await response.json()
-        if (!data.phone_number.length || isEmpty(data.location)) {
+        if (!data.phone_number?.length || isEmpty(data.location)) {
           setVisible(false)
           setPopupVisible(true)
         }
@@ -239,13 +239,15 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
               />
               {errors.phoneNumber && <div className="text-xs text-red-600">{getErrorMessage(errors.phoneNumber)}</div>}
             </Box>
-            <Box flex className="space-x-5 pt-6">
-              <button className="rounded-xl text-white bg-primary py-2 px-2 font-semibold"
+            <Box flex className="space-x-3 pt-6">
+              <button className="rounded-xl text-slate-400 bg-slate-200 py-2 px-1 font-semibold w-full flex flex-col justify-between items-stretch"
                 onClick={getUserInfo}
+                disabled={true}
               >
-                Điền thông tin của tôi
+                <span>Điền thông tin của tôi</span>
+                <span>(tạm dừng cung cấp)</span>
               </button>
-              <button className="rounded-xl border border-primary text-primary bg-white py-2 px-2 font-semibold"
+              <button className="rounded-xl text-white bg-primary py-2 px-5 font-semibold"
                 onClick={onChoosingLocation}
               >
                 Chọn thông tin nhận hàng này

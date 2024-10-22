@@ -117,6 +117,9 @@ body {
   }
 }
 
+.swiper {
+  touch-action: pen-y;
+}
 .cus-input-search {
   height: 32px;
   font-size: small;

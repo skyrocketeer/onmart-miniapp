@@ -12,6 +12,7 @@ import { getConfig } from "utils/config";
 import { App, SnackbarProvider, ZMPRouter } from "zmp-ui";
 import { ConfigProvider } from "./config-provider";
 import VoucherPage from "pages/voucher";
+import ContactPage from "pages/contact";
 
 const MyApp = () => {
   return (
@@ -32,7 +33,7 @@ const MyApp = () => {
                 <Route path="/voucher" element={<VoucherPage />} />
                 <Route path="/notification" element={<NotificationPage />} />
                 <Route path="/cart" element={<CartPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/contact" element={<ContactPage />} />
                 <Route path="/result" element={<CheckoutResultPage />} />
               </Routes>
             </ZMPRouter>

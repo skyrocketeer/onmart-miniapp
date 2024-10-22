@@ -37,12 +37,12 @@ const tabs: Array<NavItemProps> = [
     icon: <CartIcon />,
     activeIcon: <CartIcon active />,
   },
-  // {
-  //   path: "/profile",
-  //   label: "Cá nhân",
-  //   icon: <Icon icon="zi-user" />,
-  //   // activeIcon: <Icon icon="zi-user-solid" />,
-  // },
+  {
+    path: "/contact",
+    label: "Liên hệ",
+    icon: <Icon icon="zi-chat" />,
+    // activeIcon: <Icon icon="zi-user-solid" />,
+  },
 ];
 
 export const NO_BOTTOM_NAVIGATION_PAGES = ["/search", "/category", "/result"];
