@@ -13,8 +13,8 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const quantity = useRecoilValue(totalQuantityState);
   const totalPrice = useRecoilValue(totalPriceState);
   const [selectedVoucher, setVoucher] = useRecoilState(voucherState)
-  const { contents: voucherList } = useRecoilValueLoadable(voucherData);
   const [isErr, setIsErr] = useState(false)
+  const [isDisabled, setDisabled] = useState(quantity <= 0)
   const SHIP_FEE = Number(process.env.SHIP_FEE) || 20000
   const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 150000
   const actualShipFee = totalPrice > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
@@ -23,6 +23,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (!isEmpty(value)) setIsErr(false)
+    setDisabled(false)
     setVoucher({ ...selectedVoucher, code: value, value: '0' });
   }
 
@@ -50,7 +51,8 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
             ...prevVoucher, // Spread previous state
             code: result.code, // Make sure code is set
             value: result.rate // Update value with the fetched rate
-          }));
+          }))
+          setDisabled(true)
         } else {
           console.error('Error fetching data:', response.statusText);
           setIsErr(true)
@@ -90,14 +92,16 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           />
           <Button size="small"
             className="w-44 h-10 rounded-md"
-            disabled={quantity <= 0 || isErr || isEmpty(selectedVoucher.value)}
+            disabled={isDisabled || isErr || isEmpty(selectedVoucher.value)}
             onClick={verifyVoucher}
           >
             ÁP DỤNG
           </Button>
         </Box>
         {isErr && <Box className="!mt-[5px]">
-          <Text size="xxSmall" className="text-red-500">Mã khuyến mãi đã hết hạn hoặc không hợp lệ</Text>
+          <Text size="xxSmall" className="text-red-500">
+            Mã khuyến mãi đã hết hạn hoặc không hợp lệ
+          </Text>
         </Box>}
         <Box
           flex
