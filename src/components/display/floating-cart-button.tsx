@@ -24,7 +24,7 @@ const FloatingCartButton = forwardRef<HTMLDivElement, FloatingCartButtonProps>(
       <Box
         py={3}
         m={3}
-        className="bg-amber-800 overflow-auto rounded-2xl text-white"
+        className="bg-red overflow-auto rounded-2xl text-white"
         onClick={handleOnClick}
         role="button"
         // @ts-ignore

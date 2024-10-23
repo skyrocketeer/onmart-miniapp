@@ -13,7 +13,6 @@ export const Banner: FC = () => {
       const response = await fetch(`${API_URL}/sheet/banners`);
       if (response.ok) {
         const result = await response.json();
-        console.log('Banner:', result);
         setBanners(result);
       } else {
         console.error('Error fetching data:', response.statusText);
@@ -37,7 +36,7 @@ export const Banner: FC = () => {
         autoplay
         loop
       >
-        {banners.length > 0 ? (
+        {banners.length > 1 ? (
           banners.map((url, index) => (
             <SwiperSlide key={index} className="px-4">
               <Box

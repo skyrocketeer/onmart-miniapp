@@ -55,10 +55,10 @@ const Other: FC = () => {
     window.location.href = `tel:${number}`;
   };
 
-  const handleMessenger = () => {
-    // Replace 'your-page-id' with your actual Facebook page ID
-    window.open(`fb-messenger://thread/100000093199045`, '_blank');
-  };
+  // const handleMessenger = () => {
+  //   // Replace 'your-page-id' with your actual Facebook page ID
+  //   window.open(`fb-messenger://thread/`, '_blank');
+  // };
 
   const handleZaloChat = () => {
     openChat({
@@ -139,18 +139,18 @@ const Other: FC = () => {
                     ),
                   }
                 )),
+                // {
+                //   left: <Icon icon="zi-inbox" />,
+                //   right: (
+                //     <Box onClick={handleMessenger}>
+                //       <Text.Header className="text-primary">
+                //         Nhắn tin qua Messenger cho Fanpage OnMart
+                //       </Text.Header>
+                //     </Box>
+                //   ),
+                // },
                 {
                   left: <Icon icon="zi-inbox" />,
-                  right: (
-                    <Box onClick={handleMessenger}>
-                      <Text.Header className="text-primary">
-                        Nhắn tin qua Messenger cho Fanpage OnMart
-                      </Text.Header>
-                    </Box>
-                  ),
-                },
-                {
-                  left: <Icon icon="zi-chat-solid" />,
                   right: (
                     <Box onClick={handleZaloChat}>
                       <Text.Header className="text-primary">

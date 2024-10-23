@@ -150,7 +150,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
         type="highlight"
         disabled={!quantity || isSubmitting}
         htmlType="submit"
-        className="mt-6"
+        className="mt-6 text-red"
       >
         Đặt hàng
       </Button>
