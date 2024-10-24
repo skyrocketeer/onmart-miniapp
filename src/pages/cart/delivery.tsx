@@ -113,7 +113,7 @@ export const Delivery = ({ control, errors, setValue, getValues }: {
                 <Box className="flex-1 space-y-[2px]">
                   <TimePicker />
                   <Text size="xSmall" className="text-gray">
-                    Thời gian nhận hàng
+                    Thời gian nhận hàng (nếu quá 5h chiều, sẽ giao vào 7h sáng mai)
                   </Text>
                 </Box>
                 <Icon icon="zi-chevron-right" />

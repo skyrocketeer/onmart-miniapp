@@ -14,6 +14,7 @@ import { cartState, shippingInfoState, totalPriceState, totalQuantityState, vouc
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { v4 as uuidv4 } from 'uuid';
+import { fromMilisToDate } from "utils/date";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -73,7 +74,8 @@ const CartPage = () => {
         isCustom: false,
       },
       quantity,
-      item: listOrderItem
+      item: listOrderItem,
+      createdTime: fromMilisToDate(new Date().getTime())
     } as OrderData
   }
 

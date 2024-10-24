@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
 import { displayHalfAnHourTimeRange } from "utils/date";
@@ -23,9 +23,13 @@ export const TimePicker: FC = () => {
 
   const availableTimes = useMemo(() => {
     const times: Date[] = [];
-    const now = new Date();
+    const now = new Date(date); // Use the current date from state
     let time = new Date();
-    if (now.getDate() === new Date(date).getDate()) {
+    // If the current time is after 4 PM, set the starting time to 7 AM
+    if (now.getHours() >= 17) {
+      time.setHours(7);
+      time.setMinutes(0);
+    } else if (now.getDate() === new Date().getDate()) {
       // Starting time is the current time rounded up to the nearest 30 minutes
       const minutes = Math.ceil(now.getMinutes() / 30) * 30;
       time.setHours(now.getHours());
@@ -35,13 +39,16 @@ export const TimePicker: FC = () => {
       time.setHours(7);
       time.setMinutes(0);
     }
+
     time.setSeconds(0);
     time.setMilliseconds(0);
+
     const endTime = new Date();
-    endTime.setHours(24);
+    endTime.setHours(17);
     endTime.setMinutes(0);
     endTime.setSeconds(0);
     endTime.setMilliseconds(0);
+
     while (time <= endTime) {
       times.push(new Date(time));
       time.setMinutes(time.getMinutes() + 30);

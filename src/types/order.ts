@@ -7,6 +7,7 @@ export interface OrderData {
   description?: string,
   extraData: object,
   item: Record<string, any>[],
+  createdTime: string,
 }
 
 type ShippingDataKey = keyof typeof defaultShippingState;
