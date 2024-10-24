@@ -1,17 +1,18 @@
 import { DisplayPrice } from "components/display/price";
 import { Divider } from "components/divider";
 import { isEmpty, truncate } from "lodash";
-import React, { ChangeEvent, startTransition, useEffect, useMemo, useState } from "react";
+import React, { ChangeEvent, startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilState, useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
 import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherData, voucherState } from "state";
 import { VoucherData } from "types/voucher";
 import { API_URL } from "utils/constant";
-import { convertDiscountPriceToNumber, splitByComma } from "utils/price";
+import { calcTotalAmount, convertDiscountPriceToNumber, splitByComma } from "utils/price";
 import { Box, Button, Input, Text } from "zmp-ui";
 
 export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const quantity = useRecoilValue(totalQuantityState);
-  const totalPrice = useRecoilValue(totalPriceState);
+  const [totalPrice, setTotalPrice] = useRecoilState(totalPriceState);
+  const cart = useRecoilValue(cartState)
   const [selectedVoucher, setVoucher] = useRecoilState(voucherState)
   const [isErr, setIsErr] = useState(false)
   const [isDisabled, setDisabled] = useState(quantity <= 0)
@@ -33,6 +34,11 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
 
   const promoCodeValue = useMemo(() => calculateFinalPrice(totalPrice), [selectedVoucher, totalPrice]);
 
+  const finalPrice = useCallback(() => {
+    const finalAmount = calcTotalAmount(cart, - actualShipFee + promoCodeValue)
+    return finalAmount
+  }, [actualShipFee, promoCodeValue]);
+
   useEffect(() => {
     startTransition(() => {
       setShippingInfo(prevShippingInfo => ({
@@ -40,7 +46,8 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
         shippingFee: actualShipFee,
       }));
     });
-  }, [actualShipFee])
+    setTotalPrice(finalPrice)
+  }, [actualShipFee, finalPrice])
 
   const verifyVoucher = (_): void => {
     fetch(`${API_URL}/promo?ref_code=${selectedVoucher.code}`)
@@ -76,7 +83,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
             {quantity} sản phẩm
           </Text>
           <Text size="small" className="text-primary">
-            <DisplayPrice useCurrency>{totalPrice}</DisplayPrice>
+            <DisplayPrice useCurrency>{calcTotalAmount(cart, 0)}</DisplayPrice>
           </Text>
         </Box>
         <Box flex justifyContent="space-between" className="!mt-4 space-x-4">
@@ -144,7 +151,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           </Text.Title>
           <Text size="xLarge" className="text-blue-600 font-bold">
             <DisplayPrice useCurrency>
-              {totalPrice + actualShipFee - promoCodeValue}
+              {finalPrice()}
             </DisplayPrice>
           </Text>
         </Box>

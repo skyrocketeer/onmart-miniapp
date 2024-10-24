@@ -31,6 +31,7 @@ const CartPage = () => {
   const selectedVoucher = useRecoilValue(voucherState)
   const resetShipDataState = useResetRecoilState(shippingInfoState)
   const resetOrderDataState = useResetRecoilState(cartState)
+  const resetVoucherState = useResetRecoilState(voucherState)
 
   // React Hook Form setup
   const methods = useForm<ShippingData>({
@@ -140,6 +141,7 @@ const CartPage = () => {
       try {
         resetOrderDataState()
         resetShipDataState()
+        resetVoucherState()
         navigate(`/result${location.search}`)
       } catch (err) {
         console.log('payment err ', err)

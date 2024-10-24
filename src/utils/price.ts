@@ -1,4 +1,4 @@
-import { SelectedOptions } from "types/cart";
+import { Cart, SelectedOptions } from "types/cart";
 import { Option, Product } from "types/product";
 import { convertStringToNumber } from "./helpers";
 import { isEmpty } from "lodash";
@@ -6,44 +6,14 @@ import { isEmpty } from "lodash";
 export function calcFinalPrice(product: Product, options?: SelectedOptions) {
   const priceBefore = convertStringToNumber(product.priceBefore);
   const priceSale = convertStringToNumber(product.priceSale || "0");
-  //   if (product.sale.type === "fixed") {
-    // finalPrice = product.price - product.sale.amount;
-  //   } else {
   const finalPrice = priceBefore - priceSale;
-  //   }
-  // }
-
-  // if (options && product.sku) {
-  //   const selectedOptions: Option[] = [];
-  //   for (const variantKey in options) {
-      // const variant = product.variants.find((v) => v.id === variantKey);
-      // if (variant) {
-      //   const currentOption = options[variantKey];
-      //   if (typeof currentOption === "string") {
-      //     const selected = variant.options.find((o) => o.id === currentOption);
-      //     if (selected) {
-      //       selectedOptions.push(selected);
-      //     }
-      //   } else {
-      //     const selecteds = variant.options.filter((o) =>
-      //       currentOption.includes(o.id),
-      //     );
-      //     selectedOptions.push(...selecteds);
-      //   }
-      // }
-    // }
-    // finalPrice = selectedOptions.reduce((price, option) => {
-    //   if (option.priceChange) {
-    //     if (option.priceChange.type == "fixed") {
-    //       return price + option.priceChange.amount;
-    //     } else {
-    //       return price + convertPriceToNumber(product.priceBefore) * option.priceChange.percent;
-    //     }
-    //   }
-    //   return price;
-    // }, finalPrice);
-  // }
   return finalPrice > 0 ? finalPrice : priceBefore;
+}
+
+export function calcTotalAmount(cart: Cart, reducedPrice: number) {
+  const totalCart = cart.reduce((total, item) =>
+    total + item.quantity * calcFinalPrice(item.product, item.options),0);
+  return totalCart < reducedPrice ? 0 : totalCart - reducedPrice;
 }
 
 export function isIdentical(

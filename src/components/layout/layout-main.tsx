@@ -1,12 +1,13 @@
 import { useHandlePayment } from "hooks";
-import React, { ReactNode, useEffect } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { totalPriceState, totalQuantityState } from "state";
+import { cartState, totalPriceState, totalQuantityState } from "state";
 import { getSystemInfo } from "zmp-sdk";
 import { Box, Page, useNavigate } from "zmp-ui";
 import FloatingCartButton from "../display/floating-cart-button";
 import { Navigation } from "../navigation";
 import { ScrollRestoration } from "../scroll-restoration";
+import { calcTotalAmount } from "utils/price";
 
 if (getSystemInfo().platform === "android") {
   const androidSafeTop = Math.round(
@@ -21,8 +22,7 @@ if (getSystemInfo().platform === "android") {
 
 export const MainLayout = ({ children }: { children: ReactNode }) => {
   const totalQuantity = useRecoilValue(totalQuantityState);
-  const totalPrice = useRecoilValue(totalPriceState);
-
+  const cart = useRecoilValue(cartState);
   const navigate = useNavigate();
   // useHandlePayment();
 
@@ -33,12 +33,12 @@ export const MainLayout = ({ children }: { children: ReactNode }) => {
         <Box className="flex-1 flex flex-col overflow-hidden">
           {children}
         </Box>
-        {totalPrice > 0 && (
+        {cart.length > 0 && (
           <FloatingCartButton
             content="Hoàn tất đơn hàng"
             // type="primary"
             quantity={totalQuantity}
-            totalPrice={totalPrice}
+            totalPrice={calcTotalAmount(cart, 0)}
             handleOnClick={() => {
               navigate("/cart");
             }}

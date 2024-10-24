@@ -125,16 +125,9 @@ export const voucherState = atom<{
   }
 })
 
-export const totalPriceState = selector({
+export const totalPriceState = atom({
   key: "totalPrice",
-  get: ({ get }) => {
-    const cart = get(cartState);
-    return cart.reduce(
-      (total, item) =>
-        total + item.quantity * calcFinalPrice(item.product, item.options),
-      0
-    );
-  },
+  default: 0
 });
 
 export const notificationsState = atom<Notification[]>({

@@ -39,7 +39,7 @@ export function useVirtualKeyboardVisible() {
 export const useCreateOrder = async (orderData: OrderData, shippingData: ShippingData, callback: Function) => {
   const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
   const mutableShippingData = {...shippingData, shippingTime: 
-    `${fromMilisToDate(+shippingData.shippingTime)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
+    `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
   const mac = await generateMac(orderData, mutableShippingData)
   await Payment.createOrder({
     desc:
