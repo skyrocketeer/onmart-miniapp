@@ -42,7 +42,7 @@ export const RecommendContent: FC = () => {
                   </Box>
                   <Box className="space-y-1">
                     <Text size="small">{product.name}</Text>
-                    <Text size="xxSmall" className="line-through text-red-600">
+                    <Text size="xxSmall" className="line-through text-red">
                       <DisplayPrice useCurrency>{convertStringToNumber(product.priceBefore)}</DisplayPrice>
                     </Text>
                     <Text size="large" className="font-medium text-primary">

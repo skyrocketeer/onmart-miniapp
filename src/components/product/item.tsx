@@ -68,7 +68,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
               <Box className="h-full col-span-2 overflow-hidden py-4">
                 <Text className="font-semibold">{product.name}</Text>
                 {product.priceBefore > product.priceSale ?
-                  (<Text size="xxSmall" className="line-through text-red-600">
+                  (<Text size="xxSmall" className="line-through text-red">
                     <DisplayPrice useCurrency>{convertStringToNumber(product.priceBefore)}</DisplayPrice>
                   </Text>
                   ) : null

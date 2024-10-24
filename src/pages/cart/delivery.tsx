@@ -77,7 +77,7 @@ export const Delivery = ({ control, errors, setValue, getValues }: {
                   onClick={() => setShipType(ShipType.AT_DOOR)}
                 >
                   <Text size="small" className="font-semibold text-white">
-                    Nhận hàng tại địa chỉ <sup className="text-red-600">*</sup>
+                    Nhận hàng tại địa chỉ <sup className="text-red">*</sup>
                   </Text>
                   <Box flex alignItems="center" className="space-x-4">
                     <Icon className="text-white" icon="zi-radio-checked" size={18} />

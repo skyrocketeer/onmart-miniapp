@@ -99,7 +99,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           </Button>
         </Box>
         {isErr && <Box className="!mt-[5px]">
-          <Text size="xxSmall" className="text-red-500">
+          <Text size="xxSmall" className="text-red">
             Mã khuyến mãi đã hết hạn hoặc không hợp lệ
           </Text>
         </Box>}
@@ -109,12 +109,12 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           alignItems="center"
         >
           <Text size="xSmall" className="text-slate-500">
-            Mã giảm giá: {truncate(selectedVoucher.code, {
+            Mã giảm giá: <span className="text-orange-600">{truncate(selectedVoucher.code, {
               length: 15, separator: '.'
-            })}
+            })}</span>
           </Text>
           {isErr &&
-            <Text size="xxSmall" className="!ml-[-15px] text-red-500">
+            <Text size="xxSmall" className="!ml-[-15px] text-red">
               (không thể áp dụng mã)
             </Text>}
           <Text size="small" className="text-orange-500">

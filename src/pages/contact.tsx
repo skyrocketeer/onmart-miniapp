@@ -82,7 +82,7 @@ const Other: FC = () => {
           {
             text: "Đóng",
             onClick: () => setPopupVisible(false),
-            className: "!text-red-400"
+            className: "!text-red"
           },
         ]}
       />

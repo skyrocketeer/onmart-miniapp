@@ -134,7 +134,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     let { name, value } = event.target;
     if (name === 'phoneNumber') {
-      value = truncate(value, { length: 10 });
+      value = truncate(value, { length: 10, omission: '' });
     }
     return value
   };
@@ -172,11 +172,11 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
             highLight: true,
           },
         ]}
-        modalClassName="text-red-500 text-center"
+        modalClassName="text-red text-center"
         description="Có lỗi xảy ra hoặc bạn cần cấp quyền cho ứng dụng để lấy được thông tin vị trí và số điện thoại"
       />
       {(errors.clientName || errors.phoneNumber) &&
-        <div className="text-xs text-red-600 mt-1">Thông tin người nhận chưa chính xác</div>
+        <div className="text-xs text-red mt-1">Thông tin người nhận chưa chính xác</div>
       }
       {createPortal(
         <Sheet visible={visible}
@@ -185,7 +185,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
         >
           <Box px={6} py={8} className="space-y-3">
             <Text size="normal" className="text-slate-500 font-bold">Thông tin người nhận
-              <span className="text-red-600 font-light text-sm"> (bắt buộc)</span>
+              <span className="text-red font-light text-sm"> (bắt buộc)</span>
             </Text>
             <Box>
               <Controller
@@ -210,7 +210,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
                 )}
               />
               {errors.clientName &&
-                <div className="text-xs text-red-600">
+                <div className="text-xs text-red">
                   {getErrorMessage(errors.clientName)}
                 </div>
               }
@@ -237,7 +237,7 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
                   />
                 )}
               />
-              {errors.phoneNumber && <div className="text-xs text-red-600">{getErrorMessage(errors.phoneNumber)}</div>}
+              {errors.phoneNumber && <div className="text-xs text-red">{getErrorMessage(errors.phoneNumber)}</div>}
             </Box>
             <Box flex className="space-x-3 pt-6">
               <button className="rounded-xl text-slate-400 bg-slate-200 py-2 px-1 font-semibold w-full flex flex-col justify-between items-stretch"
