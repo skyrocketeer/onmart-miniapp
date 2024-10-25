@@ -25,7 +25,6 @@ export const PersonPicker = ({ control, errors, setValue, getHookFormValues }: {
 }) => {
   const [globalState, updateState] = useRecoilState(shippingInfoState);
   const handleChangeDeliveryInfo = (newData: DeliveryInfo) => {
-    console.log("newData ", newData)
     updateState({ ...globalState, ...newData })
   }
 

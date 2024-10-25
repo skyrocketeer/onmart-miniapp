@@ -36,6 +36,7 @@ function padToTwoDigits(num) {
 
 export function fromMilisToDate(milis: number, isOnlyDate = false) {
   const date = new Date(milis);
+
   const day = padToTwoDigits(date.getDate());
   const month = padToTwoDigits(date.getMonth() + 1); // Months are 0-based
   const year = date.getFullYear();

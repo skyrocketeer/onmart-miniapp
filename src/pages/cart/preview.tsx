@@ -28,13 +28,12 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
     setVoucher({ ...selectedVoucher, code: value, value: '0' });
   }
 
-  const convertedPromoValue = useMemo(() => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value), [selectedVoucher.code])
+  const convertedPromoValue = useMemo(() => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value)
+    , [selectedVoucher.value])
 
   const cartAmount = useMemo(() => calcTotalAmount(cart, 0), [totalPrice])
 
-  const actualPromoCodeValue = useMemo(() => {
-    return convertedPromoValue < 1 ? cartAmount * convertedPromoValue : cartAmount - convertedPromoValue
-  }, [selectedVoucher, totalPrice]);
+  const actualPromoCodeValue = useMemo(() => convertedPromoValue < 1 ? cartAmount * convertedPromoValue : cartAmount - convertedPromoValue, [selectedVoucher, totalPrice]);
 
   const finalPrice = useCallback(() => {
     const finalAmount = calcTotalAmount(cart, - actualShipFee + actualPromoCodeValue)

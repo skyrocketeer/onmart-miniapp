@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useMemo, useState } from "react";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
-import { displayHalfAnHourTimeRange } from "utils/date";
+import { displayHalfAnHourTimeRange, fromMilisToDate } from "utils/date";
 import { matchStatusBarColor } from "utils/device";
 import { Picker } from "zmp-ui";
 
@@ -9,6 +9,10 @@ export const TimePicker: FC = () => {
   const [globalState, setGlobalState] = useRecoilState(shippingInfoState)
   const [date, setDate] = useState(+new Date());
   const [milis, setMilis] = useState(globalState.shippingTime);
+
+  useEffect(() => {
+    onChoosingShipTime()
+  }, [])
 
   const availableDates = useMemo(() => {
     const days: Date[] = [];
@@ -25,7 +29,7 @@ export const TimePicker: FC = () => {
     const times: Date[] = [];
     const now = new Date(date); // Use the current date from state
     let time = new Date();
-    // If the current time is after 4 PM, set the starting time to 7 AM
+    // If the current time is after 4 PM, set the starting time to 7 AM tomorrow
     if (now.getHours() >= 17) {
       time.setHours(7);
       time.setMinutes(0);
@@ -45,7 +49,7 @@ export const TimePicker: FC = () => {
 
     const endTime = new Date();
     endTime.setHours(17);
-    endTime.setMinutes(0);
+    endTime.setMinutes(30);
     endTime.setSeconds(0);
     endTime.setMilliseconds(0);
 
@@ -55,6 +59,17 @@ export const TimePicker: FC = () => {
     }
     return times;
   }, [date]);
+
+  const onChoosingShipTime = () => {
+    let mutabletMilis = milis
+    // Check if the selected date is today
+    const selectedDate = new Date();
+    const today = new Date();
+    if (selectedDate.getDate() === today.getDate() && selectedDate.getHours() >= 17) {
+      mutabletMilis = +milis + 86400000
+    }
+    setGlobalState({ ...globalState, shippingTime: mutabletMilis })
+  }
 
   return (
     <Picker
@@ -102,9 +117,7 @@ export const TimePicker: FC = () => {
       ]}
       action={{
         text: "Chọn thời gian giao hàng này",
-        onClick: (e) => {
-          setGlobalState({ ...globalState, shippingTime: milis })
-        },
+        onClick: onChoosingShipTime,
         close: true
       }}
     />

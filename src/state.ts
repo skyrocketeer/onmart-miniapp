@@ -294,7 +294,7 @@ export const phoneState = atom<string>({
 export const defaultShippingState = {
   clientName: "",
   phoneNumber: "",
-  shippingTime: new Date().getTime(),
+  shippingTime: Date.now(),
   shippingAddress: "",
   note: "",
   shippingFee: 20000
