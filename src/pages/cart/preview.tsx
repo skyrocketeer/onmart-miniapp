@@ -28,16 +28,18 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
     setVoucher({ ...selectedVoucher, code: value, value: '0' });
   }
 
-  const calcPromoCodeValue = () => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value)
+  const convertedPromoValue = useMemo(() => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value), [selectedVoucher.code])
 
-  const calculateFinalPrice = (originPrice: number) => calcPromoCodeValue() < 1 ? originPrice * calcPromoCodeValue() : originPrice - calcPromoCodeValue()
+  const cartAmount = useMemo(() => calcTotalAmount(cart, 0), [totalPrice])
 
-  const promoCodeValue = useMemo(() => calculateFinalPrice(totalPrice), [selectedVoucher, totalPrice]);
+  const actualPromoCodeValue = useMemo(() => {
+    return convertedPromoValue < 1 ? cartAmount * convertedPromoValue : cartAmount - convertedPromoValue
+  }, [selectedVoucher, totalPrice]);
 
   const finalPrice = useCallback(() => {
-    const finalAmount = calcTotalAmount(cart, - actualShipFee + promoCodeValue)
+    const finalAmount = calcTotalAmount(cart, - actualShipFee + actualPromoCodeValue)
     return finalAmount
-  }, [actualShipFee, promoCodeValue]);
+  }, [actualShipFee, actualPromoCodeValue]);
 
   useEffect(() => {
     startTransition(() => {
@@ -126,7 +128,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
             </Text>}
           <Text size="small" className="text-orange-500">
             <DisplayPrice useCurrency>
-              {promoCodeValue}
+              {actualPromoCodeValue}
             </DisplayPrice>
           </Text>
         </Box>
