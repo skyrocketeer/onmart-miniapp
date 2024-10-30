@@ -1,4 +1,4 @@
-import { FinalPrice } from "components/display/final-price";
+import { DisplayPrice } from "components/display/price";
 import { DisplaySelectedOptions } from "components/display/selected-options";
 import { ListRenderer } from "components/list-renderer";
 import { ProductPicker } from "components/product/picker";
@@ -6,6 +6,7 @@ import React, { FC, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { cartState } from "state";
 import { CartItem } from "types/cart";
+import { calcFinalPrice } from "utils/price";
 import { Box, Text } from "zmp-ui";
 
 export const CartItems: FC = () => {
@@ -39,9 +40,9 @@ export const CartItems: FC = () => {
                   <Box className="space-y-1 flex-1">
                     <Text size="small">{item.product.name}</Text>
                     <Text className="text-gray" size="xSmall">
-                      <FinalPrice options={item.options}>
-                        {item.product}
-                      </FinalPrice>
+                      <DisplayPrice useCurrency>
+                        {calcFinalPrice(item.product)}
+                      </DisplayPrice>
                     </Text>
                     <Text className="text-gray" size="xxxSmall">
                       <DisplaySelectedOptions options={item.options}>

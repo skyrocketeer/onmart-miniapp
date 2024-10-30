@@ -1,9 +1,10 @@
-import { FinalPrice } from "components/display/final-price";
+import { DisplayPrice } from "components/display/price";
 import { ProductPicker } from "components/product/picker";
 import { ProductSearchResultSkeleton } from "components/skeletons";
 import React, { FC, Suspense } from "react";
 import { useRecoilValue } from "recoil";
 import { resultState } from "state";
+import { calcFinalPrice } from "utils/price";
 import { Box, Text } from "zmp-ui";
 
 const SearchResultContent: FC = () => {
@@ -26,7 +27,9 @@ const SearchResultContent: FC = () => {
                   <Box className="space-y-2">
                     <Text>{product.name}</Text>
                     <Text size="xSmall" className="text-gray">
-                      <FinalPrice>{product}</FinalPrice>
+                      <DisplayPrice useCurrency>
+                        {calcFinalPrice(product)}
+                      </DisplayPrice>
                     </Text>
                   </Box>
                 </div>

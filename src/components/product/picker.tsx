@@ -1,4 +1,3 @@
-import { FinalPrice } from "components/display/final-price";
 import { Sheet } from "components/fullscreen-sheet";
 import React, { FC, ReactNode, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -6,11 +5,12 @@ import { useSetRecoilState } from "recoil";
 import { cartState } from "state";
 import { SelectedOptions } from "types/cart";
 import { Product } from "types/product";
-import { isIdentical } from "utils/price";
+import { calcFinalPrice, isIdentical } from "utils/price";
 import { Box, Button, Text } from "zmp-ui";
 import { MultipleOptionPicker } from "./multiple-option-picker";
 import { QuantityPicker } from "./quantity-picker";
 import { SingleOptionPicker } from "./single-option-picker";
+import { DisplayPrice } from "components/display/price";
 
 export interface ProductPickerProps {
   product?: Product;
@@ -132,7 +132,9 @@ export const ProductPicker: FC<ProductPickerProps> = ({
               <Box className="space-y-2">
                 <Text.Title>{product.name}</Text.Title>
                 <Text>
-                  <FinalPrice options={options}>{product}</FinalPrice>
+                  <DisplayPrice useCurrency>
+                    {calcFinalPrice(product)}
+                  </DisplayPrice>
                 </Text>
                 <Text>
                   <div

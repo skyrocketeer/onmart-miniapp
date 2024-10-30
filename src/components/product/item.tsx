@@ -1,4 +1,3 @@
-import { FinalPrice } from "components/display/final-price";
 import { DisplayPrice } from "components/display/price";
 import React, { FC } from "react";
 import { Product } from "types/product";
@@ -7,6 +6,7 @@ import { ProductPicker } from "./picker";
 import cx, { convertStringToNumber } from "utils/helpers";
 import { useRecoilValue } from "recoil";
 import { cartState } from "state";
+import { calcFinalPrice } from "utils/price";
 
 export const ProductItem: FC<{ product: Product }> = ({ product }) => {
   const cart = useRecoilValue(cartState)
@@ -65,17 +65,21 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
                 src={product.image}
                 className="w-24 h-20 rounded-lg bg-skeleton col-span-1"
               />
-              <Box className="h-full col-span-2 overflow-hidden py-4">
+              <Box className="h-full col-span-2 overflow-hidden py-3 space-y-1">
                 <Text className="font-semibold">{product.name}</Text>
-                {product.priceBefore > product.priceSale ?
-                  (<Text size="xxSmall" className="line-through text-red">
-                    <DisplayPrice useCurrency>{convertStringToNumber(product.priceBefore)}</DisplayPrice>
+                <Box flex className="space-x-2 items-center">
+                  {convertStringToNumber(product.priceBefore) > calcFinalPrice(product) ?
+                    (<Text size="small" className="line-through text-red">
+                      <DisplayPrice useCurrency>
+                        {convertStringToNumber(product.priceBefore)}
+                      </DisplayPrice>
+                    </Text>
+                    ) : null
+                  }
+                  <Text size="large" className="font-semibold text-primary">
+                    <DisplayPrice useCurrency>{calcFinalPrice(product)}</DisplayPrice>
                   </Text>
-                  ) : null
-                }
-                <Text size="large" className="font-medium text-primary">
-                  <FinalPrice>{product}</FinalPrice>
-                </Text>
+                </Box>
                 <Text size="xSmall" className="text-orange-400">
                   Đơn vị tính: {product.unit}
                 </Text>

@@ -1,4 +1,3 @@
-import { FinalPrice } from "components/display/final-price";
 import { DisplayPrice, getDiscountInPercent } from "components/display/price";
 import { ProductPicker } from "components/product/picker";
 import { Section } from "components/section";
@@ -8,6 +7,7 @@ import { useRecoilValue } from "recoil";
 import { recommendProductsState } from "state";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { convertStringToNumber } from "utils/helpers";
+import { calcFinalPrice } from "utils/price";
 import { Box, Text } from "zmp-ui";
 
 export const RecommendContent: FC = () => {
@@ -30,13 +30,13 @@ export const RecommendContent: FC = () => {
                         size="xxxxSmall"
                         className="absolute right-2 top-2 uppercase bg-green text-white h-4 px-[6px] rounded-full"
                       >
-                        {"-"}
+                        {/* {"-"} */}
                         {/* {convertStringToNumber(product.priceSale) * 100}% */}
                         {/* {product.priceSale.type === "percent" ? ( */}
                         {/* `$?{product.priceSale.percent * 100}%` */}
                         {/* // ) : ( */}
                         <DisplayPrice>{Math.round(getDiscountInPercent(product.priceBefore, product.priceSale || "0") * 100)}</DisplayPrice>
-                        {"%"}
+                        <span>%</span>
                       </Text>
                     )}
                   </Box>
@@ -46,7 +46,9 @@ export const RecommendContent: FC = () => {
                       <DisplayPrice useCurrency>{convertStringToNumber(product.priceBefore)}</DisplayPrice>
                     </Text>
                     <Text size="large" className="font-medium text-primary">
-                      <FinalPrice>{product}</FinalPrice>
+                      <DisplayPrice useCurrency>
+                        {calcFinalPrice(product)}
+                      </DisplayPrice>;
                     </Text>
                   </Box>
                 </div>
