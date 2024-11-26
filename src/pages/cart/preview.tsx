@@ -100,7 +100,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           />
           <Button size="small"
             className="w-44 h-10 rounded-md"
-            disabled={isDisabled || isErr || isEmpty(selectedVoucher.value)}
+            disabled={isDisabled || isErr || isEmpty(selectedVoucher.code)}
             onClick={verifyVoucher}
           >
             ÁP DỤNG

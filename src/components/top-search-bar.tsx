@@ -8,7 +8,7 @@ export const SearchBar: FC = () => {
       <Input.Search
         className="cus-input-search"
         onFocus={() => navigate("/search")}
-        placeholder="Tìm nhanh đồ uống, món mới ..."
+        placeholder="Tìm sản phẩm..."
       />
     </Box>
   );

@@ -2,9 +2,22 @@ import { MainLayout } from "components/layout/layout-main";
 import { ListRenderer } from "components/list-renderer";
 import { useToBeImplemented } from "hooks";
 import React, { FC, useState } from "react";
-import { Box, Header, Icon, Modal, Sheet, Text } from "zmp-ui";
+import { Box, Button, Header, Icon, Input, Modal, Sheet, Spinner, Text } from "zmp-ui";
 import { createPortal } from "react-dom";
 import { openChat } from "zmp-sdk/apis";
+import { splitByComma } from "utils/price";
+import { API_URL } from "utils/constant";
+import { isEmpty } from "lodash";
+
+type RevenueData = {
+  code: string,
+  name: string,
+  income:
+  {
+    month: string,
+    amount: number
+  }[]
+}
 
 const Personal: FC = () => {
   const onClick = useToBeImplemented();
@@ -46,10 +59,14 @@ const Personal: FC = () => {
 };
 
 const Other: FC = () => {
-  const [sheetVisible, setSheetVisible] = useState(false)
-  const [popupVisible, setPopupVisible] = useState(false)
-
+  const [contactSheetVisible, setContactSheetVisible] = useState(false)
+  const [contactPopup, setContactPopup] = useState(false)
+  const [inputSheetVisible, setInputSheetVisible] = useState(false)
+  const [revenuePopup, setRevenuePopup] = useState(false)
+  const [code, setCode] = useState("")
   const phoneNumbers = ['0799800444', '0357141817'];
+  const [revenueData, setRevenueData] = useState<RevenueData | null>(null);
+  const [errMsg, setErrMsg] = useState(false)
 
   const handleCall = (number) => {
     window.location.href = `tel:${number}`;
@@ -67,32 +84,119 @@ const Other: FC = () => {
     })
   }
 
-  return (
-    <Box className="m-4">
+  const checkRevenue = () => {
+    if (isEmpty(code)) return
+    fetch(`${API_URL}/sheet/ctv_revenue?ref_code=${code}`)
+      .then(async (response) => {
+        if (response.ok) {
+          setInputSheetVisible(false)
+          const data = await response.json() as RevenueData
+          setErrMsg(false)
+          setRevenueData(data)
+          setRevenuePopup(true)
+        } else {
+          console.log('Error fetching data:', response.status);
+          if (response.status === 400) {
+            setErrMsg(true)
+          }
+        }
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+
+  const CallingPopup = () =>
+    <Modal
+      visible={contactPopup}
+      modalClassName="text-slate-800 text-justify"
+      description="Gọi cho chúng tôi ngay để có cơ hội trở thành đại lí hoặc CTV với chính sách hoa hồng hấp dẫn"
+      actions={[
+        {
+          text: "Gọi ngay",
+          onClick: () => handleCall(phoneNumbers[0]),
+          highLight: true
+        },
+        {
+          text: "Đóng",
+          onClick: () => setContactPopup(false),
+          className: "!text-red"
+        },
+      ]}
+    />
+
+  const RevenueCheckPopup = ({ data }: { data: RevenueData }) => {
+    const { code, name, income } = data;
+
+    const RevenueRow = () => (
+      <Box className="mt-5"
+      >
+        <Box flex justifyContent="space-between">
+          <Text.Title className="text-slate-500">Mã CTV</Text.Title>
+          <Text.Title className="text-[#0069F6]">{code}</Text.Title>
+        </Box>
+
+        <Box flex justifyContent="space-between" className="mt-2">
+          <Text.Title className="text-slate-500">Tên CTV</Text.Title>
+          <Text.Title className="text-[#0069F6]">{name}</Text.Title>
+        </Box>
+
+        <Box flex justifyContent="space-between" className="font-semibold mt-5 text-slate-500">
+          <Text.Header>Tháng</Text.Header>
+          <Text.Header>Doanh thu</Text.Header>
+        </Box>
+
+        {income && income.length > 0 ? (
+          income.map((entry, index) => (
+            <Box
+              key={index}
+              flex
+              justifyContent="space-between"
+              className="mt-2 text-[#0069F6]"
+            >
+              <Box flex flexDirection="column">
+                <Text.Header>{entry.month}</Text.Header>
+              </Box>
+
+              <Box className="space-y-1">
+                <Text.Header>{splitByComma(entry.amount)} đ</Text.Header>
+              </Box>
+            </Box>
+          ))
+        ) : (
+          <Text className="text-slate-400">Không có doanh thu</Text>
+        )}
+      </Box>
+    )
+    return (
       <Modal
-        visible={popupVisible}
-        modalClassName="text-slate-800 text-justify"
-        description="Gọi cho chúng tôi ngay để có cơ hội trở thành đại lí hoặc CTV với chính sách hoa hồng hấp dẫn"
+        visible={revenuePopup}
+        modalClassName="text-slate-600 space-y-[-25px]"
+        title='Lịch sử doanh thu'
+        children={<RevenueRow />}
+        actionsDivider={false}
         actions={[
           {
-            text: "Gọi ngay",
-            onClick: () => handleCall(phoneNumbers[0]),
-            highLight: true
-          },
-          {
             text: "Đóng",
-            onClick: () => setPopupVisible(false),
+            onClick: () => setRevenuePopup(false),
             className: "!text-red"
           },
         ]}
       />
+    )
+  }
+
+  return (
+    <Box className="m-4">
+      <CallingPopup />
+      {revenueData && <RevenueCheckPopup data={revenueData} />}
       <ListRenderer
         title=""
         items={[
           {
             left: <Icon icon="zi-star" />,
             right: (
-              <Box flex onClick={() => setPopupVisible(true)}>
+              <Box flex onClick={() => setContactPopup(true)}>
                 <Text.Header className="flex-1 items-center font-normal">
                   Trở thành cộng tác viên
                 </Text.Header>
@@ -101,9 +205,20 @@ const Other: FC = () => {
             ),
           },
           {
+            left: <Icon icon="zi-note" />,
+            right: (
+              <Box flex onClick={() => setInputSheetVisible(true)}>
+                <Text.Header className="flex-1 items-center font-normal">
+                  Xem doanh thu cộng tác viên
+                </Text.Header>
+                <Icon icon="zi-chevron-right" />
+              </Box>
+            ),
+          },
+          {
             left: <Icon icon="zi-call" />,
             right: (
-              <Box flex onClick={() => setSheetVisible(true)}>
+              <Box flex onClick={() => setContactSheetVisible(true)}>
                 <Text.Header className="flex-1 items-center font-normal">
                   Liên hệ và góp ý
                 </Text.Header>
@@ -116,8 +231,8 @@ const Other: FC = () => {
         renderRight={(item) => item.right}
       />
       {createPortal(
-        <Sheet visible={sheetVisible}
-          onClose={() => setSheetVisible(false)}
+        <Sheet visible={contactSheetVisible}
+          onClose={() => setContactSheetVisible(false)}
           autoHeight
         >
           <Box px={3} py={1} className="space-y-4 h-96">
@@ -163,6 +278,40 @@ const Other: FC = () => {
               renderLeft={(item) => item.left}
               renderRight={(item) => item.right}
             />
+          </Box>
+        </Sheet >
+        , document.body,
+      )}
+      {createPortal(
+        <Sheet visible={inputSheetVisible}
+          onClose={() => setInputSheetVisible(false)}
+          height={5}
+        >
+          <Box px={3} py={1} className="space-y-2 h-96">
+            <Text.Title className="text-lg text-center">
+              Nhập mã CTV
+            </Text.Title>
+            <Box flex className="space-x-2">
+              <Input placeholder="Nhập địa chỉ"
+                className="text-sm"
+                size="small"
+                value={code}
+                onChange={(event) => {
+                  setCode(event.target.value)
+                }}
+              />
+              <button
+                className="px-8 py-3 rounded-3xl bg-primary text-white"
+                onClick={checkRevenue}
+                disabled={!code}
+              >
+                Tìm
+              </button>
+            </Box>
+            {errMsg &&
+              <Text className="mx-2 text-red">
+                Không tìm thấy mã CTV
+              </Text>}
           </Box>
         </Sheet >
         , document.body,

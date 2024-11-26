@@ -1,7 +1,6 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { Pagination } from "swiper";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { getDefaultBanner } from "utils/async";
 import { API_URL } from "utils/constant";
 import { Box } from "zmp-ui";
 
@@ -26,7 +25,7 @@ export const Banner: FC = () => {
     getBannerList();
   }, [getBannerList]);
 
-  return (
+  return banners.length > 1 ? (
     <Box className="bg-white" pb={4}>
       <Swiper
         modules={[Pagination]}
@@ -36,8 +35,7 @@ export const Banner: FC = () => {
         autoplay
         loop
       >
-        {banners.length > 1 ? (
-          banners.map((url, index) => (
+        {banners.map((url, index) => (
             <SwiperSlide key={index} className="px-4">
               <Box
                 className="w-full rounded-lg aspect-[2/1] bg-cover bg-center"
@@ -45,13 +43,14 @@ export const Banner: FC = () => {
               />
             </SwiperSlide>
           ))
-        ) : (
-          <Box className="w-full px-4">
-            <img src={getDefaultBanner()}
-              className="rounded-lg w-96" />
-          </Box>
-        )}
+        }
       </Swiper>
+    </Box>) :
+    (<Box className="w-full px-4">
+      <Box
+        className="w-full rounded-lg aspect-[2/1] animate-pulse"
+        style={{ backgroundColor: "#E0E0E0" }}
+      />
     </Box>
-  );
+    );
 };

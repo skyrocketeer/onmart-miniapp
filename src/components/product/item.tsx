@@ -80,7 +80,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
                     <DisplayPrice useCurrency>{calcFinalPrice(product)}</DisplayPrice>
                   </Text>
                 </Box>
-                <Text size="xSmall" className="text-orange-400">
+                <Text size="xSmall" className="text-orange-400 font-semibold">
                   Đơn vị tính: {product.unit}
                 </Text>
               </Box>
