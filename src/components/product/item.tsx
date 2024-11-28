@@ -26,6 +26,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
       else {
         if (getCurrentQuantity(sku) > 0)
           added(-1);
+        added(0);
       }
     }; // Hàm chỉ được tạo lại khi `count` thay đổi
     return (

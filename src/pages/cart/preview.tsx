@@ -1,9 +1,8 @@
 import { DisplayPrice } from "components/display/price";
-import { Divider } from "components/divider";
 import { isEmpty, truncate } from "lodash";
 import React, { ChangeEvent, startTransition, useCallback, useEffect, useMemo, useState } from "react";
-import { useRecoilState, useRecoilValue, useRecoilValueLoadable, useSetRecoilState } from "recoil";
-import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherData, voucherState } from "state";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherState } from "state";
 import { VoucherData } from "types/voucher";
 import { API_URL } from "utils/constant";
 import { calcTotalAmount, convertDiscountPriceToNumber, splitByComma } from "utils/price";
@@ -17,7 +16,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const [isErr, setIsErr] = useState(false)
   const [isDisabled, setDisabled] = useState(quantity <= 0)
   const SHIP_FEE = Number(process.env.SHIP_FEE) || 20000
-  const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 150000
+  const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 300000
   const actualShipFee = totalPrice > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
   const setShippingInfo = useSetRecoilState(shippingInfoState)
 

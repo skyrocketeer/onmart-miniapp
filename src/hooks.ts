@@ -6,6 +6,7 @@ import { EventName, events, Payment } from "zmp-sdk";
 import { useNavigate, useSnackbar } from "zmp-ui";
 import { OrderData, ShippingData } from './types/order';
 import { displayTime, fromMilisToDate } from "utils/date";
+import { API_URL } from "utils/constant";
 
 export function useMatchStatusTextColor(visible?: boolean) {
   const changedRef = useRef(false);
@@ -37,31 +38,68 @@ export function useVirtualKeyboardVisible() {
 }
 
 export const useCreateOrder = async (orderData: OrderData, shippingData: ShippingData, callback: Function) => {
-  const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
-  const mutableShippingData = {...shippingData, shippingTime: 
-    `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
-  const mac = await generateMac(orderData, mutableShippingData)
-  await Payment.createOrder({
-    desc:
-      orderData.description ??
-      `Thanh toán cho ${getConfig((config) => config.app.title)}`,
-    item: orderData.item,
-    extradata: orderData.extraData,
-    method: {
-      id: orderData.method.id,
-      isCustom: orderData.method.isCustom
-    },
-    mac,
-    amount: orderData.amount,
-    success: (data) => {
-      const { orderId } = data;
-      callback(orderId)
-    },
-    fail: (err) => {
-      throw err
-    },
-  });
+  try {
+    const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
+      const mutableShippingData = {...shippingData, shippingTime: 
+        `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
+      const macString = generateMac(orderData, mutableShippingData)
+
+      // create order backend
+      const mac = await createNewOrder(macString, mutableShippingData)
+
+      // create order Zalo
+      await Payment.createOrder({
+        desc:
+          orderData.description ??
+          `Thanh toán cho ${getConfig((config) => config.app.title)}`,
+        item: orderData.item,
+        extradata: orderData.extraData,
+        method: {
+          id: orderData.method.id,
+          isCustom: orderData.method.isCustom
+        },
+        mac,
+        amount: orderData.amount,
+        success: (data) => {
+          const { orderId } = data;
+          callback(orderId)
+        },
+        fail: (err) => {
+          throw err
+        },
+      });
+  }
+  catch (err) {
+    console.log('err in hook use create order ', err);
+  }
 }
+
+async function createNewOrder(dataMac: string, shippingData: Object): Promise<string> {
+  try {
+    // Make the API request
+    const response = await fetch(`${API_URL}/payment/checkout`, { 
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ orderData: dataMac, shippingData })
+    });
+
+    if (!response.ok) {
+      console.error('Error: Network response was not ok', response);
+      return "";
+    }
+    const data = await response.text();
+    console.log('Data received:', data);
+    return data["mac"] || ""
+
+  } catch (error) {
+    // Catch any other errors such as network issues
+    console.log('Error in create order:', error);
+    return "";
+  }
+}
+
 
 export const useHandlePayment = () => {
   const navigate = useNavigate();

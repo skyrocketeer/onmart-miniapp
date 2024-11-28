@@ -2,7 +2,7 @@ import PaymentCard, { PAYMENT_OPTION } from "components/card/payment-method";
 import { Divider } from "components/divider";
 import { SecondaryLayout } from "components/layout/layout-secondary";
 import { useCreateOrder, useVirtualKeyboardVisible } from "hooks";
-import React, { Suspense, useState } from "react";
+import React, { useState } from "react";
 import cx from "utils/helpers";
 import { Box, Header, Icon, Text, useNavigate } from "zmp-ui";
 import { CartItems } from "./cart-items";
@@ -14,7 +14,7 @@ import { cartState, shippingInfoState, totalPriceState, totalQuantityState, vouc
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { v4 as uuidv4 } from 'uuid';
-import { fromMilisToDate } from "utils/date";
+import { displayDate, displayTime } from "utils/date";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -51,7 +51,6 @@ const CartPage = () => {
   const keyboardVisible = useVirtualKeyboardVisible();
 
   const generateMacData = () => {
-    const tid = uuidv4()
     const listOrderItem: Record<string, any>[] = []
     cart.forEach(item => {
       listOrderItem.push({
@@ -65,9 +64,6 @@ const CartPage = () => {
       amount: totalPrice,
       extraData: {
         storeName: 'onMart',
-        orderGroupId: tid,
-        myTransactionId: tid,
-        shippingFee: shippingInfo.shippingFee,
         ref_code: selectedVoucher.code,
       },
       method: {
@@ -76,7 +72,8 @@ const CartPage = () => {
       },
       quantity,
       item: listOrderItem,
-      createdTime: fromMilisToDate(new Date().getTime())
+      createdTime: displayTime(new Date()),
+      createdDate: displayDate(new Date())
     } as OrderData
   }
 

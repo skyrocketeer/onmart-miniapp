@@ -7,7 +7,7 @@ import { Box, Header, Text } from "zmp-ui";
 import appConfig from "../../../app-config.json";
 
 export const Welcome: FC = () => {
-  const user = useRecoilValueLoadable(userState);
+  // const user = useRecoilValueLoadable(userState);
 
   return (
     <Header
@@ -22,13 +22,16 @@ export const Welcome: FC = () => {
             />
             <Box>
               <Text.Title size="small">{appConfig.app.title}</Text.Title>
-              {user.state === "hasValue" ? (
+              <Text size="xxSmall" className="text-gray">
+                Chào bạn đến với siêu thị rau sạch OnMart
+              </Text>
+              {/* {user.state === "hasValue" ? (
                 <Text size="xxSmall" className="text-gray">
                   Welcome, {user.contents.name}!
                 </Text>
               ) : (
                 <Text>...</Text>
-              )}
+              )} */}
             </Box>
           </Box>
         ) as unknown as string

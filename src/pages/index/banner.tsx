@@ -25,7 +25,7 @@ export const Banner: FC = () => {
     getBannerList();
   }, [getBannerList]);
 
-  return banners.length > 1 ? (
+  return banners.length > 0 ? (
     <Box className="bg-white" pb={4}>
       <Swiper
         modules={[Pagination]}
@@ -36,13 +36,13 @@ export const Banner: FC = () => {
         loop
       >
         {banners.map((url, index) => (
-            <SwiperSlide key={index} className="px-4">
-              <Box
-                className="w-full rounded-lg aspect-[2/1] bg-cover bg-center"
-                style={{ backgroundImage: `url(${url})` }}
-              />
-            </SwiperSlide>
-          ))
+          <SwiperSlide key={index} className="px-4">
+            <Box
+              className="w-full rounded-lg aspect-[2/1] bg-cover bg-center"
+              style={{ backgroundImage: `url(${url})` }}
+            />
+          </SwiperSlide>
+        ))
         }
       </Swiper>
     </Box>) :

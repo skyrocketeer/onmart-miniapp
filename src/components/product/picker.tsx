@@ -61,51 +61,30 @@ export const ProductPicker: FC<ProductPickerProps> = ({
     if (product) {
       setCart((cart) => {
         let res = [...cart];
-        if (selected) {
-          // updating an existing cart item, including quantity and size, or remove it if new quantity is 0
-          const editing = cart.find(
-            (item) =>
-              item.product.sku === product.sku &&
-              isIdentical(item.options, selected.options),
-          )!;
+        // adding new item to cart, or merging if it already existed before
+        const existed = cart.find(
+          (item) => item.product.sku === product.sku && isIdentical(item.options, options),
+        );
+        if (existed) {
           if (quantity === 0) {
-            res.splice(cart.indexOf(editing), 1);
+            // Remove the item if quantity is 0
+            res = res.filter(item => item.product.sku !== product.sku);
+            console.log('not selected ', res)
           } else {
-            const existed = cart.find(
-              (item, i) =>
-                i !== cart.indexOf(editing) &&
-                item.product.sku === product.sku &&
-                isIdentical(item.options, options),
-            )!;
-            res.splice(cart.indexOf(editing), 1, {
-              ...editing,
-              options,
-              quantity: existed ? existed.quantity + quantity : quantity,
-            });
-            if (existed) {
-              res.splice(cart.indexOf(existed), 1);
-            }
+            // Update the quantity of the existing item
+            res = res.map(item =>
+              item.product.sku === product.sku
+                ? { ...item, quantity: item.quantity + quantity }
+                : item
+            );
           }
         } else {
-          // adding new item to cart, or merging if it already existed before
-          const existed = cart.find(
-            (item) =>
-              item.product.sku === product.sku &&
-              isIdentical(item.options, options),
-          );
-          if (existed) {
-            res.splice(cart.indexOf(existed), 1, {
-              ...existed,
-              quantity: existed.quantity + quantity,
-            });
-          } else {
-            res = res.concat({
-              product,
-              options,
-              quantity,
-            });
+          // If the item doesn't exist, add a new one to the cart
+          if (quantity > 0) {
+            res = [...res, { product, options, quantity }];
           }
         }
+
         return res;
       });
     }

@@ -11,8 +11,7 @@ import { Product } from "types/product";
 import { wait } from "utils/async";
 import { API_URL } from "utils/constant";
 import { calculateDistance } from "utils/location";
-import { calcFinalPrice } from "utils/price";
-import { getLocation, getPhoneNumber, getUserInfo } from "zmp-sdk";
+import { getUserInfo } from "zmp-sdk";
 
 export const userState = selector({
   key: "user",
