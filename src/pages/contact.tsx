@@ -292,11 +292,12 @@ const Other: FC = () => {
               Nhập mã CTV
             </Text.Title>
             <Box flex className="space-x-2">
-              <Input placeholder="Nhập địa chỉ"
+              <Input placeholder="Nhập mã cộng tác viên"
                 className="text-sm"
                 size="small"
                 value={code}
                 onChange={(event) => {
+                  console.log(event.target.value)
                   setCode(event.target.value)
                 }}
               />
