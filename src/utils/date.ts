@@ -20,13 +20,18 @@ export function displayHalfAnHourTimeRange(date: Date) {
   return `${displayTime(date)} - ${displayTime(endTime)}`;
 }
 
-export function displayDate(date: Date, hint?: boolean) {
-  const day = date.getDate().toString().padStart(2, "0");
-  const month = (date.getMonth() + 1).toString().padStart(2, "0");
-  const year = date.getFullYear().toString();
-  if (hint && isToday(date)) {
-    return `Hôm nay - ${day}/${month}/${year}`;
+export function displayDate(isHint? : boolean) {
+  const now = new Date()
+  if(isHint) {
+    if (now.getHours() < 12) {
+    return `Hôm nay - 16:00`;
   }
+    return `Ngày mai - 16:00`;
+  }
+  
+  const day = padToTwoDigits(now.getDate());
+  const month = padToTwoDigits(now.getMonth() + 1); // Months are 0-based
+  const year = now.getFullYear();
   return `${day}/${month}/${year}`;
 }
 

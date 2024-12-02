@@ -9,6 +9,7 @@ import { shippingInfoState } from "state";
 import { getErrorMessage } from "utils/form-validation";
 import { Control, Controller, FieldErrors, UseFormGetValues, UseFormSetValue } from "react-hook-form";
 import { ShippingData } from "types/order";
+import { displayDate, fromMilisToDate } from "utils/date";
 
 enum ShipType {
   AT_DOOR = "D2D",
@@ -111,12 +112,15 @@ export const Delivery = ({ control, errors, setValue, getValues }: {
             right: (
               <Box flex className="space-x-2">
                 <Box className="flex-1 space-y-[2px]">
-                  <TimePicker />
+                  <Text size="small" className="font-medium text-primary">
+                    {displayDate(true)}
+                  </Text>
+                  {/* <TimePicker /> */}
                   <Text size="xSmall" className="text-gray">
-                    Thời gian nhận hàng (nếu quá 5h chiều, sẽ giao vào 7h sáng mai)
+                    Thời gian nhận hàng (nếu quá 12 giờ trưa, sẽ giao vào 4 giờ chiều mai)
                   </Text>
                 </Box>
-                <Icon icon="zi-chevron-right" />
+                {/* <Icon icon="zi-chevron-right" /> */}
               </Box>
             ),
           },

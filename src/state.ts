@@ -115,12 +115,14 @@ export const totalQuantityState = selector({
 
 export const voucherState = atom<{
   code: string,
-  value: string
+  value: string,
+  description: string
 }>({
   key: "voucherState",
   default: {
     code: '',
-    value: ''
+    value: '',
+    description: ''
   }
 })
 
@@ -293,7 +295,6 @@ export const phoneState = atom<string>({
 export const defaultShippingState = {
   clientName: "",
   phoneNumber: "",
-  shippingTime: Date.now(),
   shippingAddress: "",
   note: "",
   shippingFee: 20000

@@ -132,7 +132,7 @@ const Other: FC = () => {
       <Box className="mt-5"
       >
         <Box flex justifyContent="space-between">
-          <Text.Title className="text-slate-500">Mã CTV</Text.Title>
+          <Text.Title className="text-slate-500">Mã cá nhân</Text.Title>
           <Text.Title className="text-[#0069F6]">{code}</Text.Title>
         </Box>
 
@@ -143,7 +143,7 @@ const Other: FC = () => {
 
         <Box flex justifyContent="space-between" className="font-semibold mt-5 text-slate-500">
           <Text.Header>Tháng</Text.Header>
-          <Text.Header>Doanh thu</Text.Header>
+          <Text.Header>Thu nhập</Text.Header>
         </Box>
 
         {income && income.length > 0 ? (
@@ -164,7 +164,7 @@ const Other: FC = () => {
             </Box>
           ))
         ) : (
-          <Text className="text-slate-400">Không có doanh thu</Text>
+            <Text className="text-slate-400">Chưa có thu nhập</Text>
         )}
       </Box>
     )
@@ -172,7 +172,7 @@ const Other: FC = () => {
       <Modal
         visible={revenuePopup}
         modalClassName="text-slate-600 space-y-[-25px]"
-        title='Lịch sử doanh thu'
+        title='Lịch sử thu nhập'
         children={<RevenueRow />}
         actionsDivider={false}
         actions={[
@@ -209,7 +209,7 @@ const Other: FC = () => {
             right: (
               <Box flex onClick={() => setInputSheetVisible(true)}>
                 <Text.Header className="flex-1 items-center font-normal">
-                  Xem doanh thu cộng tác viên
+                  Xem thu nhập cộng tác viên
                 </Text.Header>
                 <Icon icon="zi-chevron-right" />
               </Box>
@@ -289,10 +289,10 @@ const Other: FC = () => {
         >
           <Box px={3} py={1} className="space-y-2 h-96">
             <Text.Title className="text-lg text-center">
-              Nhập mã CTV
+              Nhập mã cá nhân
             </Text.Title>
             <Box flex className="space-x-2">
-              <Input placeholder="Nhập mã cộng tác viên"
+              <Input placeholder="Hãy nhập mã cá nhân"
                 className="text-sm"
                 size="small"
                 value={code}
@@ -311,7 +311,7 @@ const Other: FC = () => {
             </Box>
             {errMsg &&
               <Text className="mx-2 text-red">
-                Không tìm thấy mã CTV
+                Không tìm thấy mã cá nhân
               </Text>}
           </Box>
         </Sheet >

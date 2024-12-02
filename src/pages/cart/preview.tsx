@@ -16,7 +16,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const [isErr, setIsErr] = useState(false)
   const [isDisabled, setDisabled] = useState(quantity <= 0)
   const SHIP_FEE = Number(process.env.SHIP_FEE) || 20000
-  const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 300000
+  const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 150000
   const actualShipFee = totalPrice > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
   const setShippingInfo = useSetRecoilState(shippingInfoState)
 
@@ -54,10 +54,10 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
       .then(async (response) => {
         if (response.ok) {
           const result = await response.json() as VoucherData
-          setVoucher((prevVoucher) => ({
-            ...prevVoucher, // Spread previous state
-            code: result.code, // Make sure code is set
-            value: result.rate // Update value with the fetched rate
+          setVoucher(_ => ({
+            code: result.code,
+            value: result.rate,
+            description: result.description
           }))
           setDisabled(true)
         } else {
@@ -110,25 +110,30 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
             Mã khuyến mãi đã hết hạn hoặc không hợp lệ
           </Text>
         </Box>}
-        <Box
-          flex
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Text size="xSmall" className="text-slate-500">
-            Mã giảm giá: <span className="text-orange-600">{truncate(selectedVoucher.code, {
-              length: 15, separator: '.'
-            })}</span>
-          </Text>
-          {isErr &&
-            <Text size="xxSmall" className="!ml-[-15px] text-red">
-              (không thể áp dụng mã)
-            </Text>}
-          <Text size="small" className="text-orange-500">
-            <DisplayPrice useCurrency>
-              {actualPromoCodeValue}
-            </DisplayPrice>
-          </Text>
+        <Box>
+          <Box
+            flex
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Text size="xSmall" className="text-slate-500">
+              Mã giảm giá: <span className="text-orange-600">{truncate(selectedVoucher.code, {
+                length: 15, separator: '.'
+              })}</span>
+            </Text>
+            {isErr &&
+              <Text size="xxSmall" className="!ml-[-15px] text-red">
+                (không thể áp dụng mã)
+              </Text>}
+            <Text size="small" className="text-orange-500">
+              <DisplayPrice useCurrency>
+                {actualPromoCodeValue}
+              </DisplayPrice>
+            </Text>
+          </Box>
+          {selectedVoucher.value &&
+            <Text size="xxSmall" className="text-orange-600">{selectedVoucher.description}</Text>
+          }
         </Box>
         <Box
           flex

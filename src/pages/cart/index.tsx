@@ -38,7 +38,6 @@ const CartPage = () => {
     defaultValues: {
       clientName: shippingInfo.clientName,
       phoneNumber: shippingInfo.phoneNumber,
-      shippingTime: shippingInfo.shippingTime,
       shippingAddress: shippingInfo.shippingAddress,
       note: shippingInfo.note
     },
@@ -73,7 +72,7 @@ const CartPage = () => {
       quantity,
       item: listOrderItem,
       createdTime: displayTime(new Date()),
-      createdDate: displayDate(new Date())
+      createdDate: displayDate()
     } as OrderData
   }
 

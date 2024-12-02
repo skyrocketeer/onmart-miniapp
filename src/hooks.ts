@@ -39,13 +39,13 @@ export function useVirtualKeyboardVisible() {
 
 export const useCreateOrder = async (orderData: OrderData, shippingData: ShippingData, callback: Function) => {
   try {
-    const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
-      const mutableShippingData = {...shippingData, shippingTime: 
-        `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
-      const macString = generateMac(orderData, mutableShippingData)
+    // const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
+    //   const mutableShippingData = {...shippingData, shippingTime: 
+    //     `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
+      const macString = generateMac(orderData, shippingData)
 
       // create order backend
-      const mac = await createNewOrder(macString, mutableShippingData)
+      const mac = await createNewOrder(macString, shippingData)
 
       // create order Zalo
       await Payment.createOrder({
