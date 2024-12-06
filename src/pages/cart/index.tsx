@@ -13,7 +13,6 @@ import { OrderData, ShippingData } from "types/order";
 import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherState } from "state";
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
-import { v4 as uuidv4 } from 'uuid';
 import { displayDate, displayTime } from "utils/date";
 
 type PaymentMethodProps = {

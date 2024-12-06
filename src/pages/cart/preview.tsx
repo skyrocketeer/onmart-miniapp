@@ -18,6 +18,8 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const SHIP_FEE = Number(process.env.SHIP_FEE) || 20000
   const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 150000
   const actualShipFee = totalPrice > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
+  const MIN_AMOUNT = 120000
+
   const setShippingInfo = useSetRecoilState(shippingInfoState)
 
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -141,7 +143,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           className="text-slate-500"
         >
           <Text size="xSmall">
-            Phí giao hàng (miễn phí cho đơn hàng trên {splitByComma(FREESHIP_MIN_VALUE)}đ)
+            Phí giao hàng (miễn phí cho đơn hàng từ {splitByComma(FREESHIP_MIN_VALUE)}đ)
           </Text>
           <Text size="small" className="text-primary">
             <DisplayPrice useCurrency>{actualShipFee}</DisplayPrice>
@@ -161,10 +163,15 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           </Text>
         </Box>
       </Box>
+      {finalPrice() < MIN_AMOUNT &&
+        <Text size="xxxSmall" className="text-orange-600">
+          (chưa đạt giá trị đơn hàng tối thiểu 120,000đ)
+        </Text>
+      }
       <Button
         fullWidth
         type="highlight"
-        disabled={!quantity || isSubmitting}
+        disabled={!quantity || isSubmitting || finalPrice() < MIN_AMOUNT}
         htmlType="submit"
         className="mt-6 text-red"
       >

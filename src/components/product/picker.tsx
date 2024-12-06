@@ -69,7 +69,6 @@ export const ProductPicker: FC<ProductPickerProps> = ({
           if (quantity === 0) {
             // Remove the item if quantity is 0
             res = res.filter(item => item.product.sku !== product.sku);
-            console.log('not selected ', res)
           } else {
             // Update the quantity of the existing item
             res = res.map(item =>
