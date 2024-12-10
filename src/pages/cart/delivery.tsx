@@ -1,9 +1,8 @@
 import { ListRenderer } from "components/list-renderer";
 import React, { ChangeEvent, Suspense, useEffect, useState } from "react";
 import { Box, Icon, Input, Text } from "zmp-ui";
-import { PersonPicker, RequestPersonPickerPhone } from "./person-picker";
+import { PersonPicker } from "./person-picker";
 import { RequestStorePickerLocation, StorePicker } from "./store-picker";
-import { TimePicker } from "./time-picker";
 import { useRecoilState } from "recoil";
 import { shippingInfoState } from "state";
 import { getErrorMessage } from "utils/form-validation";

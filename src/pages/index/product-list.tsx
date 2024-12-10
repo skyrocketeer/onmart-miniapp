@@ -22,11 +22,11 @@ export const ProductListContent: FC = () => {
 };
 
 export const ProductListFallback: FC = () => {
-  const products = [...new Array(12)];
+  const products = [...new Array(3)];
 
   return (
     <Section title="Danh sách sản phẩm">
-      <Box className="grid grid-cols-2 gap-4">
+      <Box className="grid gap-4">
         {products.map((_, i) => (
           <ProductItemSkeleton key={i} />
         ))}

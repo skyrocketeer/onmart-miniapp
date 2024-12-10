@@ -10,12 +10,12 @@ import { Box, Input, Modal, Sheet, Text } from "zmp-ui";
 import { getAccessToken, openPermissionSetting, authorize, getPhoneNumber, getLocation } from "zmp-sdk/apis";
 import { API_URL } from "utils/constant";
 import { isEmpty, truncate } from "lodash";
+import { useUserBasicInfo } from "hooks";
 
 type DeliveryInfo = {
   clientName: string,
   phoneNumber: string
 }
-
 
 export const PersonPicker = ({ control, errors, setValue, getHookFormValues }: {
   control: Control<ShippingData, any>,
@@ -48,20 +48,26 @@ export const RequestPersonPickerPhone = ({ emitChangeDeliveryInfo, initialValue,
 }) => {
   const [visible, setVisible] = useState(false)
   const [popupVisible, setPopupVisible] = useState(false);
-  const currentZaloUser = useRecoilValue(userState)
+  const [currentZaloUser, setCurrentZaloUser] = useRecoilState(userState)
 
   const getUserInfo = async () => {
     try {
+      useUserBasicInfo(currentZaloUser).then(userData => setCurrentZaloUser(userData))
+
       await authorize({ scopes: ["scope.userLocation", "scope.userPhonenumber"] });
       const accessToken = await getAccessToken({});
       // console.log('accessToken', accessToken);
-      const phone_token = await getPhoneNumber({}).then(result => result.token || "")
-      // console.log(phone_token)
-      const location_token = await getLocation({}).then(result => result.token || "")
-      // console.log(location_token)
-      requestUserPrivateInfo(accessToken, phone_token, location_token)
 
-      // requestUserPrivateInfo("accessToken", "phone_token", "location_token")
+      // Handle the tokens and API requests in parallel after authorization starts
+      const tokenPromises = Promise.all([
+        getPhoneNumber({}).then(result => result.token || ""),
+        getLocation({}).then(result => result.token || "")
+      ]);
+
+      // After tokens are resolved, request private user information
+      tokenPromises.then(([phone_token, location_token]) => {
+        requestUserPrivateInfo(accessToken, phone_token, location_token);
+      });
     } catch (error) {
       // xử lý khi gọi api thất bại
       console.log("cannot ask for user permission ", error);

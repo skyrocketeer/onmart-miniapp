@@ -25,29 +25,25 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     if (!isEmpty(value)) setIsErr(false)
-    setDisabled(false)
-    setVoucher({ ...selectedVoucher, code: value, value: '0' });
+
+    setDisabled(isEmpty(value));
+    setVoucher(prev => ({ ...prev, code: value }));
   }
 
-  const convertedPromoValue = useMemo(() => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value)
-    , [selectedVoucher.value])
+  const convertedPromoValue = useMemo(() => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value), [selectedVoucher.value])
 
   const cartAmount = useMemo(() => calcTotalAmount(cart, 0), [totalPrice])
 
   const actualPromoCodeValue = useMemo(() => convertedPromoValue < 1 ? cartAmount * convertedPromoValue : cartAmount - convertedPromoValue, [selectedVoucher, totalPrice]);
 
-  const finalPrice = useCallback(() => {
-    const finalAmount = calcTotalAmount(cart, - actualShipFee + actualPromoCodeValue)
-    return finalAmount
-  }, [actualShipFee, actualPromoCodeValue]);
+  const finalPrice = useCallback(() =>
+    calcTotalAmount(cart, - actualShipFee + actualPromoCodeValue), [actualShipFee, actualPromoCodeValue]);
 
   useEffect(() => {
-    startTransition(() => {
-      setShippingInfo(prevShippingInfo => ({
-        ...prevShippingInfo,
-        shippingFee: actualShipFee,
-      }));
-    });
+    setShippingInfo(prevShippingInfo => ({
+      ...prevShippingInfo,
+      shippingFee: actualShipFee,
+    }));
     setTotalPrice(finalPrice)
   }, [actualShipFee, finalPrice])
 

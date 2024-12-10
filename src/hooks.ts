@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getConfig } from "utils/config";
 import { matchStatusBarColor } from "utils/device";
 import { generateMac } from "utils/helpers";
-import { EventName, events, Payment } from "zmp-sdk";
+import { EventName, events, getUserInfo, Payment } from "zmp-sdk";
 import { useNavigate, useSnackbar } from "zmp-ui";
 import { OrderData, ShippingData } from './types/order';
 import { displayTime, fromMilisToDate } from "utils/date";
@@ -42,32 +42,32 @@ export const useCreateOrder = async (orderData: OrderData, shippingData: Shippin
     // const halfAndHr = new Date(+shippingData.shippingTime).setMinutes(new Date(+shippingData.shippingTime).getMinutes() + 30);
     //   const mutableShippingData = {...shippingData, shippingTime: 
     //     `${fromMilisToDate(+shippingData.shippingTime, true)} ${displayTime(new Date(+shippingData.shippingTime))}-${displayTime(new Date(halfAndHr))}`}
-      const macString = generateMac(orderData, shippingData)
+    const macString = generateMac(orderData, shippingData)
 
-      // create order backend
-      const mac = await createNewOrder(macString, shippingData)
+    // create order backend
+    const mac = await createNewOrder(macString, shippingData)
 
-      // create order Zalo
-      await Payment.createOrder({
-        desc:
-          orderData.description ??
-          `Thanh toán cho ${getConfig((config) => config.app.title)}`,
-        item: orderData.item,
-        extradata: orderData.extraData,
-        method: {
-          id: orderData.method.id,
-          isCustom: orderData.method.isCustom
-        },
-        mac,
-        amount: orderData.amount,
-        success: (data) => {
-          const { orderId } = data;
-          callback(orderId)
-        },
-        fail: (err) => {
-          throw err
-        },
-      });
+    // create order Zalo
+    await Payment.createOrder({
+      desc:
+        orderData.description ??
+        `Thanh toán cho ${getConfig((config) => config.app.title)}`,
+      item: orderData.item,
+      extradata: orderData.extraData,
+      method: {
+        id: orderData.method.id,
+        isCustom: orderData.method.isCustom
+      },
+      mac,
+      amount: orderData.amount,
+      success: (data) => {
+        const { orderId } = data;
+        callback(orderId)
+      },
+      fail: (err) => {
+        throw err
+      },
+    });
   }
   catch (err) {
     console.log('err in hook use create order ', err);
@@ -129,6 +129,16 @@ export const useHandlePayment = () => {
     });
   }, []);
 };
+
+export const useUserBasicInfo = async (userData: UserInfo) => {
+  try {
+      const { userInfo } = await getUserInfo({ autoRequestPermission: true });
+      Object.assign(userData, userInfo)
+    } catch (error) {
+      console.log(error);
+    }
+    return userData
+}
 
 export function useToBeImplemented() {
   const snackbar = useSnackbar();

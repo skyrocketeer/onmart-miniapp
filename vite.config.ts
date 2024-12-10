@@ -8,5 +8,21 @@ export default () => {
     root: "./src",
     base: "",
     plugins: [tsconfigPaths(), react()],
+    // base: "/zapps/2452219874218595057/",
+    define: {
+    "process.env": {
+      BASE_URL: "/zapps/2452219874218595057/",
+    },
+  },
+  build: {
+    outDir: "www",
+    rollupOptions: {
+      output: {
+        entryFileNames: "assets/[name].module.js",
+        assetFileNames: "assets/[name].[ext]",
+      },
+    },
+    cssCodeSplit: false,
+  },
   });
 };

@@ -14,6 +14,7 @@ import { cartState, shippingInfoState, totalPriceState, totalQuantityState, vouc
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { displayDate, displayTime } from "utils/date";
+import { convertPriceToNumber } from "utils/price";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -22,7 +23,6 @@ type PaymentMethodProps = {
 }
 
 const CartPage = () => {
-  const navigate = useNavigate();
   const quantity = useRecoilValue(totalQuantityState);
   const totalPrice = useRecoilValue(totalPriceState);
   const cart = useRecoilValue(cartState);
@@ -54,7 +54,8 @@ const CartPage = () => {
       listOrderItem.push({
         sku: item.product.sku,
         name: item.product.name,
-        quantity: item.quantity
+        quantity: item.quantity,
+        price: convertPriceToNumber(item.product.priceBefore)
       })
     })
 
@@ -137,7 +138,7 @@ const CartPage = () => {
         resetOrderDataState()
         resetShipDataState()
         resetVoucherState()
-        navigate(`/result${location.search}`)
+        // navigate(`/result${location.search}`)
       } catch (err) {
         console.log('payment err ', err)
       }

@@ -1,9 +1,8 @@
 {
   "app": {
     "title": "Siêu Thị OnMart",
-    "headerColor": "",
+    "headerColor": "#ffffff",
     "textColor": "black",
-    "statusBarColor": "#ffffff",
     "leftButton": "none",
     "statusBar": "transparent",
     "selfControlLoading": false,
@@ -11,17 +10,10 @@
     "hideIOSSafeAreaBottom": false,
     "actionBarHidden": true
   },
-  "debug": false,
   "listCSS": [],
   "listSyncJS": [],
   "listAsyncJS": [],
-  "pages": [
-    "/user",
-    "/form",
-    "/dynamic-route",
-    "/about",
-    "/404"
-  ],
+  "pages": [],
   "template": {
     "primaryColor": "#006af5",
     "prefixCurrencySymbol": false,

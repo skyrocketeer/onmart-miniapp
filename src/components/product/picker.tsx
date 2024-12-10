@@ -1,16 +1,17 @@
 import { Sheet } from "components/fullscreen-sheet";
-import React, { FC, ReactNode, useCallback, useEffect, useState } from "react";
+import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { cartState } from "state";
 import { SelectedOptions } from "types/cart";
 import { Product } from "types/product";
-import { calcFinalPrice, isIdentical } from "utils/price";
+import { calcFinalPrice, convertPriceToNumber, isIdentical } from "utils/price";
 import { Box, Button, Text } from "zmp-ui";
 import { MultipleOptionPicker } from "./multiple-option-picker";
 import { QuantityPicker } from "./quantity-picker";
 import { SingleOptionPicker } from "./single-option-picker";
 import { DisplayPrice } from "components/display/price";
+import { getCurrentQuantity } from "utils/product";
 
 export interface ProductPickerProps {
   product?: Product;
@@ -48,7 +49,8 @@ export const ProductPicker: FC<ProductPickerProps> = ({
     selected ? selected.options : getDefaultOptions(product),
   );
   const [quantity, setQuantity] = useState(0);
-  const setCart = useSetRecoilState(cartState);
+  const [cart, setCart] = useRecoilState(cartState);
+  const currentQuantity = useMemo(() => getCurrentQuantity(product?.sku, cart), [product?.sku, cart]);
 
   useEffect(() => {
     if (selected) {
@@ -87,10 +89,15 @@ export const ProductPicker: FC<ProductPickerProps> = ({
         return res;
       });
     }
-    setVisible(false);
   };
 
-  const handleAddToCartNow = (quantity: number) => {
+  const handleAddToCart = (quantity: number, isClosePopup: boolean = false) => {
+    if (isClosePopup) {
+      setVisible(false);
+      if (currentQuantity < 1 && quantity) {
+        return
+      }
+    }
     setQuantity(quantity)
     addToCart(quantity)
   }
@@ -100,7 +107,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
       {children({
         open: () => setVisible(true),
         close: () => setVisible(false),
-        added: handleAddToCartNow
+        added: handleAddToCart
       })}
 
       {createPortal(
@@ -123,7 +130,7 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                 </Text>
               </Box>
               <Box className="space-y-5">
-                {product.variants &&
+                {/* {product.variants &&
                   product.variants.map((variant) =>
                     variant.type === "single" ? (
                       <SingleOptionPicker
@@ -151,30 +158,26 @@ export const ProductPicker: FC<ProductPickerProps> = ({
                         }
                       />
                     ),
-                  )}
-                <QuantityPicker value={quantity} onChange={setQuantity} />
+                  )} */}
+                <QuantityPicker value={currentQuantity} price={convertPriceToNumber(product.priceBefore)} onChange={(q) => handleAddToCart(q)} />
                 {selected ? (
                   <Button
                     variant={quantity > 0 ? "primary" : "secondary"}
                     type={quantity > 0 ? "highlight" : "neutral"}
                     fullWidth
-                    onClick={(e) => handleAddToCartNow(quantity)}
+                    onClick={(e) => handleAddToCart(quantity, true)}
                   >
-                    {quantity > 0
-                      ? selected
-                        ? "Cập nhật giỏ hàng"
-                        : "Thêm vào giỏ hàng"
-                      : "Xoá"}
+                    Cập nhật giỏ hàng
                   </Button>
                 ) : (
                   <Button
-                      disabled={!quantity}
+                      disabled={!currentQuantity}
                       variant="primary"
                       type="highlight"
                       fullWidth
-                      onClick={(e) => handleAddToCartNow(quantity)}
+                      onClick={() => setVisible(false)}
                   >
-                    Thêm vào giỏ hàng
+                      Thêm vào giỏ hàng
                   </Button>
                 )}
               </Box>

@@ -13,23 +13,13 @@ import { API_URL } from "utils/constant";
 import { calculateDistance } from "utils/location";
 import { getUserInfo } from "zmp-sdk";
 
-export const userState = selector({
+export const userState = atom({
   key: "user",
-  get: async () => {
-    let userData = {
-      id: "",
-      avatar: "",
-      name: "Người dùng Zalo",
-    }
-    try {
-      const { userInfo } = await getUserInfo({ autoRequestPermission: true });
-      userData = {...userInfo}
-    } catch (error) {
-      console.log(error);
-    } finally {
-      return userData
-    }
-  },
+  default: {
+    id: "",
+    avatar: "",
+    name: "Người dùng Zalo",
+  }
 });
 
 export const categoriesState = selector<Category[]>({

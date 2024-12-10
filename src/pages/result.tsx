@@ -64,7 +64,6 @@ const CheckoutResultPage: FC = () => {
 
   const clearCart = useResetRecoilState(cartState);
   useEffect(() => {
-    console.log(paymentResult)
     if (paymentResult?.resultCode >= 0) {
       clearCart();
     }
@@ -75,15 +74,14 @@ const CheckoutResultPage: FC = () => {
       <Page className="flex flex-col">
         <Header title="Kết quả thanh toán" />
         {(function (render: (result: RenderResultProps) => ReactNode) {
-          // if ("resultCode" in paymentResult) {
-          //   if (paymentResult.resultCode === 1) {
-              return render({
-                title: "Thanh toán thành công",
-                message: "Cảm ơn bạn đã mua hàng!",
-                orderInfo: paymentResult,
-                color: "#288F4E",
-              });
-          //   }
+          if (paymentResult.resultCode === 1) {
+            return render({
+              title: "Thanh toán thành công",
+              message: "Cảm ơn bạn đã mua hàng!",
+              orderInfo: paymentResult,
+              color: "#288F4E",
+            });
+          }
           //   if (paymentResult.resultCode === 0) {
           //     return render({
           //       title: "Thanh toán đang được xử lý",
@@ -93,14 +91,14 @@ const CheckoutResultPage: FC = () => {
           //     });
           //   }
           // }
-          // return render({
-          //   title: "Thanh toán thất bại",
-          //   message: `Đã có lỗi xảy ra trong quá trình thanh toán, vui lòng thử lại sau! Mã lỗi: ${JSON.stringify(
-          //     (paymentResult as AsyncCallbackFailObject).code
-          //   )}`,
-          //   orderInfo: paymentResult,
-          //   color: "#DC1F18",
-          // });
+          return render({
+            title: "Thanh toán thất bại",
+            message: `Đã có lỗi xảy ra trong quá trình thanh toán, vui lòng thử lại sau! Mã lỗi: ${JSON.stringify(
+              (paymentResult as AsyncCallbackFailObject).code
+            )}`,
+            orderInfo: paymentResult,
+            color: "#DC1F18",
+          });
         })(({ title, message, color }: RenderResultProps) => (
           <Box className="px-4 py-16 space-y-4 flex-1 flex flex-col justify-center items-center text-center">
             <div

@@ -1,15 +1,45 @@
-import React, { FC } from "react";
-import { Box, Button, Icon, Text } from "zmp-ui";
+import React, { FC, memo, useMemo, useState } from "react";
+import { getCurrentQuantity } from "utils/product";
+import { Box, Button, Icon, Modal, Text } from "zmp-ui";
 
 export const QuantityPicker: FC<{
   value: number;
+  price: number;
   onChange: (quantity: number) => void;
-}> = ({ value, onChange }) => {
+}> = ({ value, onChange, price }) => {
+  const [alertPopup, setAlertPopup] = useState(false)
+  const AlertPopup = () =>
+    <Modal
+      visible={alertPopup}
+      modalClassName="text-slate-800 text-justify"
+      description="Chỉ được phép chọn 1 sản phẩm ưu đãi 1K"
+      actionsDivider={false}
+      actions={[
+        {
+          text: "Đã hiểu",
+          onClick: () => setAlertPopup(false),
+          className: "!text-red"
+        },
+      ]}
+    />
+
+  const onAddProduct = (isAdding: boolean = true) => {
+    if (!isAdding) {
+      onChange(-1)
+      return
+    }
+    if (price <= 1000 && value >= 1) {
+      setAlertPopup(true)
+      return
+    }
+    onChange(1)
+  }
   return (
     <Box flex className="border border-[#e9ebed] rounded-full p-[6px]">
+      <AlertPopup />
       <Button
         disabled={value < 1}
-        onClick={() => onChange(value - 1)}
+        onClick={() => onAddProduct(false)}
         variant="secondary"
         type="neutral"
         icon={
@@ -24,7 +54,7 @@ export const QuantityPicker: FC<{
         </Text>
       </Box>
       <Button
-        onClick={() => onChange(value + 1)}
+        onClick={() => onAddProduct()}
         variant="secondary"
         type="neutral"
         icon={<Icon icon="zi-plus" />}

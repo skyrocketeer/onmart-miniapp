@@ -1,5 +1,5 @@
 import { DisplayPrice } from "components/display/price";
-import React, { FC, useState } from "react";
+import React, { FC, useMemo, useState } from "react";
 import { Product } from "types/product";
 import { Box, Icon, Modal, Text } from "zmp-ui";
 import { ProductPicker } from "./picker";
@@ -7,17 +7,11 @@ import cx, { convertStringToNumber } from "utils/helpers";
 import { useRecoilValue } from "recoil";
 import { cartState } from "state";
 import { calcFinalPrice, convertPriceToNumber } from "utils/price";
+import { getCurrentQuantity } from "utils/product";
 
 export const ProductItem: FC<{ product: Product }> = ({ product }) => {
   const cart = useRecoilValue(cartState)
-
-  const getCurrentQuantity = (sku: string) => {
-    const existed = cart.find(item => item.product.sku === sku)
-    if (existed) {
-      return existed.quantity
-    }
-    return 0
-  }
+  const currentQuantity = useMemo(() => getCurrentQuantity(product.sku, cart), [product.sku, cart]);
 
   const AddButton = ({ added }: { added: Function }) => {
     const [alertPopup, setAlertPopup] = useState(false)
@@ -46,7 +40,7 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
         added(+1);
       }
       else {
-        if (getCurrentQuantity(sku) > 0)
+        if (currentQuantity > 0)
           added(-1);
         added(0);
       }
@@ -60,12 +54,12 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
         >
           <Icon
             icon="zi-minus-circle-solid"
-            className={cx("h-6 w-6", getCurrentQuantity(product.sku) > 0 ? "text-primary" : 'text-slate-200')}
+            className={cx("h-6 w-6", currentQuantity > 0 ? "text-primary" : 'text-slate-200')}
           />
         </Box>
         <AlertPopup />
-        <span className="text-slate-4001 font-semibold">{getCurrentQuantity(product.sku)}</span>
-        <Box onClick={() => handleClick(true, product.sku, convertPriceToNumber(product.priceBefore), getCurrentQuantity(product.sku) >= 1)} role='button'>
+        <span className="text-slate-4001 font-semibold">{currentQuantity}</span>
+        <Box onClick={() => handleClick(true, product.sku, convertPriceToNumber(product.priceBefore), currentQuantity >= 1)} role='button'>
           <Icon
             icon="zi-plus-circle-solid"
             className="h-6 w-6 text-primary"
