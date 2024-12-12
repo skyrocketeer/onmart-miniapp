@@ -2,7 +2,7 @@ import { DisplayPrice } from "components/display/price";
 import { isEmpty, truncate } from "lodash";
 import React, { ChangeEvent, startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherState } from "state";
+import { cartState, shippingInfoState, totalQuantityState, voucherState } from "state";
 import { VoucherData } from "types/voucher";
 import { API_URL } from "utils/constant";
 import { calcTotalAmount, convertDiscountPriceToNumber, splitByComma } from "utils/price";
@@ -10,42 +10,47 @@ import { Box, Button, Input, Text } from "zmp-ui";
 
 export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
   const quantity = useRecoilValue(totalQuantityState);
-  const [totalPrice, setTotalPrice] = useRecoilState(totalPriceState);
   const cart = useRecoilValue(cartState)
   const [selectedVoucher, setVoucher] = useRecoilState(voucherState)
   const [isErr, setIsErr] = useState(false)
   const [isDisabled, setDisabled] = useState(quantity <= 0)
   const SHIP_FEE = Number(process.env.SHIP_FEE) || 20000
   const FREESHIP_MIN_VALUE = Number(process.env.FREESHIP_AMOUNT) || 150000
-  const actualShipFee = totalPrice > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
+  const [actualShipFee, setActualShipFee] = useState(0)
   const MIN_AMOUNT = 120000
 
   const setShippingInfo = useSetRecoilState(shippingInfoState)
 
   const handleInputChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
-    if (!isEmpty(value)) setIsErr(false)
-
+    setIsErr(isEmpty(value))
     setDisabled(isEmpty(value));
     setVoucher(prev => ({ ...prev, code: value }));
   }
 
   const convertedPromoValue = useMemo(() => isEmpty(selectedVoucher.code) ? 0 : convertDiscountPriceToNumber(selectedVoucher.value), [selectedVoucher.value])
 
-  const cartAmount = useMemo(() => calcTotalAmount(cart, 0), [totalPrice])
+  const cartAmount = useMemo(() => calcTotalAmount(cart, 0), [])
 
-  const actualPromoCodeValue = useMemo(() => convertedPromoValue < 1 ? cartAmount * convertedPromoValue : cartAmount - convertedPromoValue, [selectedVoucher, totalPrice]);
+  const actualPromoCodeValue = useMemo(() => convertedPromoValue < 1 ? cartAmount * convertedPromoValue : cartAmount - convertedPromoValue, [selectedVoucher.value, cartAmount]);
 
-  const finalPrice = useCallback(() =>
-    calcTotalAmount(cart, - actualShipFee + actualPromoCodeValue), [actualShipFee, actualPromoCodeValue]);
+  const finalPrice = useMemo(() =>
+    cartAmount - actualPromoCodeValue + actualShipFee, [actualPromoCodeValue]);
 
   useEffect(() => {
-    setShippingInfo(prevShippingInfo => ({
-      ...prevShippingInfo,
-      shippingFee: actualShipFee,
-    }));
-    setTotalPrice(finalPrice)
-  }, [actualShipFee, finalPrice])
+    const shipFeeCalc = cartAmount > FREESHIP_MIN_VALUE ? 0 : SHIP_FEE
+    setActualShipFee(shipFeeCalc)
+    // Only update if the shipping fee has changed
+    setShippingInfo(prevShippingInfo => {
+      if (prevShippingInfo.shippingFee !== actualShipFee) {
+        return {
+          ...prevShippingInfo,
+          shippingFee: actualShipFee,
+        }
+      }
+      return prevShippingInfo;
+    });
+  }, [cartAmount]);
 
   const verifyVoucher = (_): void => {
     fetch(`${API_URL}/promo?ref_code=${selectedVoucher.code}`)
@@ -60,6 +65,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           setDisabled(true)
         } else {
           console.error('Error fetching data:', response.statusText);
+          debugger
           setIsErr(true)
         }
       })
@@ -91,7 +97,6 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
             name="code"
             value={selectedVoucher.code}
             onChange={(event) => {
-              // onChange(event);
               handleInputChange(event)
             }}
           />
@@ -103,7 +108,8 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
             ÁP DỤNG
           </Button>
         </Box>
-        {isErr && <Box className="!mt-[5px]">
+        {isErr &&
+          <Box className="!mt-[5px]">
           <Text size="xxSmall" className="text-red">
             Mã khuyến mãi đã hết hạn hoặc không hợp lệ
           </Text>
@@ -119,10 +125,6 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
                 length: 15, separator: '.'
               })}</span>
             </Text>
-            {isErr &&
-              <Text size="xxSmall" className="!ml-[-15px] text-red">
-                (không thể áp dụng mã)
-              </Text>}
             <Text size="small" className="text-orange-500">
               <DisplayPrice useCurrency>
                 {actualPromoCodeValue}
@@ -154,12 +156,12 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
           </Text.Title>
           <Text size="xLarge" className="text-blue-600 font-bold">
             <DisplayPrice useCurrency>
-              {finalPrice()}
+              {finalPrice}
             </DisplayPrice>
           </Text>
         </Box>
       </Box>
-      {finalPrice() < MIN_AMOUNT &&
+      {finalPrice < MIN_AMOUNT &&
         <Text size="xxxSmall" className="text-orange-600">
           (chưa đạt giá trị đơn hàng tối thiểu 120,000đ)
         </Text>
@@ -167,7 +169,7 @@ export const CartPreview = ({ isSubmitting }: { isSubmitting: boolean }) => {
       <Button
         fullWidth
         type="highlight"
-        disabled={!quantity || isSubmitting || finalPrice() < MIN_AMOUNT}
+        disabled={!quantity || isSubmitting || finalPrice < MIN_AMOUNT}
         htmlType="submit"
         className="mt-6 text-red"
       >

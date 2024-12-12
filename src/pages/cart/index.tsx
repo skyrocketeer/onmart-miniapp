@@ -2,19 +2,19 @@ import PaymentCard, { PAYMENT_OPTION } from "components/card/payment-method";
 import { Divider } from "components/divider";
 import { SecondaryLayout } from "components/layout/layout-secondary";
 import { useCreateOrder, useVirtualKeyboardVisible } from "hooks";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import cx from "utils/helpers";
-import { Box, Header, Icon, Text, useNavigate } from "zmp-ui";
+import { Box, Header, Icon, Text } from "zmp-ui";
 import { CartItems } from "./cart-items";
 import { Delivery } from "./delivery";
 import { CartPreview } from "./preview";
 import { TermsAndPolicies } from "./term-and-policies";
 import { OrderData, ShippingData } from "types/order";
-import { cartState, shippingInfoState, totalPriceState, totalQuantityState, voucherState } from "state";
+import { cartState, shippingInfoState, totalQuantityState, voucherState } from "state";
 import { useForm } from "react-hook-form";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { displayDate, displayTime } from "utils/date";
-import { convertPriceToNumber } from "utils/price";
+import { calcTotalAmount, convertPriceToNumber } from "utils/price";
 
 type PaymentMethodProps = {
   type: PAYMENT_OPTION,
@@ -24,13 +24,14 @@ type PaymentMethodProps = {
 
 const CartPage = () => {
   const quantity = useRecoilValue(totalQuantityState);
-  const totalPrice = useRecoilValue(totalPriceState);
   const cart = useRecoilValue(cartState);
   const shippingInfo = useRecoilValue(shippingInfoState)
   const selectedVoucher = useRecoilValue(voucherState)
   const resetShipDataState = useResetRecoilState(shippingInfoState)
   const resetOrderDataState = useResetRecoilState(cartState)
   const resetVoucherState = useResetRecoilState(voucherState)
+
+  const totalPrice = useMemo(() => calcTotalAmount(cart, 0), [])
 
   // React Hook Form setup
   const methods = useForm<ShippingData>({
@@ -138,7 +139,6 @@ const CartPage = () => {
         resetOrderDataState()
         resetShipDataState()
         resetVoucherState()
-        // navigate(`/result${location.search}`)
       } catch (err) {
         console.log('payment err ', err)
       }

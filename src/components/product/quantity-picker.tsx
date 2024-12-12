@@ -1,5 +1,4 @@
 import React, { FC, memo, useMemo, useState } from "react";
-import { getCurrentQuantity } from "utils/product";
 import { Box, Button, Icon, Modal, Text } from "zmp-ui";
 
 export const QuantityPicker: FC<{

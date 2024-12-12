@@ -7,7 +7,7 @@ import { shippingInfoState, userState } from "state";
 import { ShippingData } from "types/order";
 import { getErrorMessage, phoneNumberRegex, unicodeAlphabetRegex } from "utils/form-validation";
 import { Box, Input, Modal, Sheet, Text } from "zmp-ui";
-import { getAccessToken, openPermissionSetting, authorize, getPhoneNumber, getLocation } from "zmp-sdk/apis";
+import { getAccessToken, authorize, getPhoneNumber, getLocation } from "zmp-sdk/apis";
 import { API_URL } from "utils/constant";
 import { isEmpty, truncate } from "lodash";
 import { useUserBasicInfo } from "hooks";

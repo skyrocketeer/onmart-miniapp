@@ -8,11 +8,13 @@ import { useRecoilValue } from "recoil";
 import { cartState } from "state";
 import { calcFinalPrice, convertPriceToNumber } from "utils/price";
 import { getCurrentQuantity } from "utils/product";
+import FireProgressBar from "components/progress/fire";
 
 export const ProductItem: FC<{ product: Product }> = ({ product }) => {
   const cart = useRecoilValue(cartState)
   const currentQuantity = useMemo(() => getCurrentQuantity(product.sku, cart), [product.sku, cart]);
-
+  const finalPriceMemo = useMemo(() => calcFinalPrice(product), [])
+  const randomNum = Math.floor(Math.random() * 21) + 30;
   const AddButton = ({ added }: { added: Function }) => {
     const [alertPopup, setAlertPopup] = useState(false)
 
@@ -42,7 +44,8 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
       else {
         if (currentQuantity > 0)
           added(-1);
-        added(0);
+        else
+          added(0);
       }
     }; // Hàm chỉ được tạo lại khi `count` thay đổi
     return (
@@ -86,9 +89,9 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
                 </span>
               }
               <Box className="h-full col-span-2 overflow-hidden py-3 space-y-1">
-                <Text className="font-semibold">{product.name}</Text>
+                <Text className="font-semibold block max-w-[9rem]">{product.name}</Text>
                 <Box flex className="space-x-2 items-center">
-                  {convertStringToNumber(product.priceBefore) > calcFinalPrice(product) ?
+                  {convertStringToNumber(product.priceBefore) > finalPriceMemo ?
                     (<Text size="small" className="line-through text-red">
                       <DisplayPrice useCurrency>
                         {convertStringToNumber(product.priceBefore)}
@@ -97,9 +100,12 @@ export const ProductItem: FC<{ product: Product }> = ({ product }) => {
                     ) : null
                   }
                   <Text size="large" className="font-semibold text-primary">
-                    <DisplayPrice useCurrency>{calcFinalPrice(product)}</DisplayPrice>
+                    <DisplayPrice useCurrency>{finalPriceMemo}</DisplayPrice>
                   </Text>
                 </Box>
+                {finalPriceMemo === 1000 &&
+                  <FireProgressBar progress={randomNum} />
+                }
                 <Text size="xSmall" className="text-orange-400 font-semibold">
                   Đơn vị tính: {product.unit}
                 </Text>

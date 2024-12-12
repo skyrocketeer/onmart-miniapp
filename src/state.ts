@@ -11,7 +11,6 @@ import { Product } from "types/product";
 import { wait } from "utils/async";
 import { API_URL } from "utils/constant";
 import { calculateDistance } from "utils/location";
-import { getUserInfo } from "zmp-sdk";
 
 export const userState = atom({
   key: "user",
@@ -115,11 +114,6 @@ export const voucherState = atom<{
     description: ''
   }
 })
-
-export const totalPriceState = atom({
-  key: "totalPrice",
-  default: 0
-});
 
 export const notificationsState = atom<Notification[]>({
   key: "notifications",

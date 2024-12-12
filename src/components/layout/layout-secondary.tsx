@@ -5,17 +5,6 @@ import { Box, Page, useNavigate } from "zmp-ui";
 import { Navigation } from "../navigation";
 import { ScrollRestoration } from "../scroll-restoration";
 
-if (getSystemInfo().platform === "android") {
-  const androidSafeTop = Math.round(
-    (window as any).ZaloJavaScriptInterface.getStatusBarHeight() /
-    window.devicePixelRatio,
-  );
-  document.body.style.setProperty(
-    "--zaui-safe-area-inset-top",
-    `${androidSafeTop}px`,
-  );
-}
-
 export const SecondaryLayout = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   useHandlePayment();
