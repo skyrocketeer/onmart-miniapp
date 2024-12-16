@@ -115,6 +115,11 @@ export const voucherState = atom<{
   }
 })
 
+export const randomStock = selector<number>({
+  key: 'randomStock',
+  get: () => Math.floor(Math.random() * 21) + 30
+})
+
 export const notificationsState = atom<Notification[]>({
   key: "notifications",
   default: [

@@ -5,16 +5,18 @@ import { Box, Icon, Modal, Text } from "zmp-ui";
 import { ProductPicker } from "./picker";
 import cx, { convertStringToNumber } from "utils/helpers";
 import { useRecoilValue } from "recoil";
-import { cartState } from "state";
+import { cartState, randomStock } from "state";
 import { calcFinalPrice, convertPriceToNumber } from "utils/price";
 import { getCurrentQuantity } from "utils/product";
 import FireProgressBar from "components/progress/fire";
+import { random } from "lodash";
 
 export const ProductItem: FC<{ product: Product }> = ({ product }) => {
   const cart = useRecoilValue(cartState)
   const currentQuantity = useMemo(() => getCurrentQuantity(product.sku, cart), [product.sku, cart]);
   const finalPriceMemo = useMemo(() => calcFinalPrice(product), [])
-  const randomNum = Math.floor(Math.random() * 21) + 30;
+  const randomNum = useRecoilValue(randomStock);
+
   const AddButton = ({ added }: { added: Function }) => {
     const [alertPopup, setAlertPopup] = useState(false)
 
